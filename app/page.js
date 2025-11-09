@@ -1,5 +1,4 @@
-'use client';
-
+"use client";
 import { useState, useEffect } from 'react';
 import { ArrowRight, TrendingUp, ChartPie as PieChart, Shield, CircleCheck as CheckCircle2, Smartphone, CreditCard, ChartBar as BarChart3, Clock, Calculator, FileCheck, ChevronDown } from 'lucide-react';
 
