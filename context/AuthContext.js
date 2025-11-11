@@ -10,11 +10,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const verifyLogin = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/verify-user`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/proxy`, {
           method: "GET",
           credentials: "include",
         });
-
         if (res.ok) {
           const data = await res.json();
           setIsLoggedIn(true);
@@ -60,5 +59,3 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// optional custom hook
-// export const useAuth = () => useContext(AuthContext);

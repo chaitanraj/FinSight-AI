@@ -5,13 +5,15 @@ import { FaApple } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { toast } from "react-toastify";
+import { AuthContext } from '@/context/AuthContext';
 
 function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
+    const{login}=useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -34,6 +36,7 @@ function LoginPage() {
             if (res.ok) {
                 console.log("Login successful:", data);
                 console.log("Name: ",data.user.name)
+                login(data.user);
                 // toast.success(`Welcome ${data.user.name}`);
                   toast.success(`Welcome ${data.user.name}`);
 

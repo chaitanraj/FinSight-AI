@@ -44,7 +44,6 @@ export default function RootLayout({ children }) {
           draggable
           pauseOnHover
           theme="dark"
-          // transition={Bounce}
         />
         <Footer />
         </AuthProvider>

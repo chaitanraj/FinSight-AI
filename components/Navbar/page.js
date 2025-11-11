@@ -14,9 +14,15 @@ const page = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { isLoggedIn, username, login, logout } = useContext(AuthContext);
   const dropdownRef = useRef(null);
-  const handleLogout=()=>{
+  const [loggingOut, setLoggingOut] = useState(false);
 
-  }
+  const handleLogout = async (e) => {
+    setLoggingOut(true);
+    await logout();
+    setIsDropdownOpen(false);
+    setLoggingOut(false);
+    router.push("/");
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -97,7 +103,7 @@ const page = () => {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 cursor-pointer"
                   >
                     <span>{username}</span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -109,18 +115,26 @@ const page = () => {
                         onClick={() => {
                           setIsDropdownOpen(false);
                         }}
-                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-emerald-50 transition-colors duration-200 text-gray-700 hover:text-emerald-700"
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-emerald-50 transition-colors duration-200 text-gray-700 hover:text-emerald-700 cursor-pointer"
                       >
                         <Compass className="w-4 h-4" />
-                        <span className="font-medium">Explore</span>
+                        <span className="font-medium cursor-pointer">Explore</span>
                       </button>
                       <button
                         onClick={handleLogout}
-                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-red-50 transition-colors duration-200 text-gray-700 hover:text-red-600 border-t border-gray-100"
+                        disabled={loggingOut}
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-red-50 text-gray-700 hover:text-red-600 border-t border-gray-100 transition-colors duration-200 cursor-pointer"
                       >
-                        <LogOut className="w-4 h-4" />
-                        <span className="font-medium">Logout</span>
+                        {loggingOut ? (
+                          <span className="animate-pulse text-red-600">Logging out...</span>
+                        ) : (
+                          <>
+                            <LogOut className="w-4 h-4" />
+                            <span className="font-medium">Logout</span>
+                          </>
+                        )}
                       </button>
+
                     </div>
                   )}
                 </div>
