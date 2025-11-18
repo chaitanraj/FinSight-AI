@@ -18,7 +18,7 @@ function LoginPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!email || !password) {
-            alert("Please fill in all fields");
+            toast.warn("Please fill in all fields");
             return;
         }
 
@@ -42,15 +42,13 @@ function LoginPage() {
 
                 router.push("/");
             } else {
-                alert(data?.message || "Login failed");
+                toast.error(data?.message || "Login failed");
             }
         } catch (err) {
             console.error("Error:", err);
-            alert("Server error");
+            toast.error("Server error");
         }
     };
-
-
 
     return (
         <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 py-12">

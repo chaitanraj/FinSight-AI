@@ -36,11 +36,11 @@ function SignupPage() {
 
         router.push("/");
       } else {
-        alert(data?.message || "Login failed");
+        toast.error(data?.message || "Login failed");
       }
     } catch (err) {
       console.error("Error:", err);
-      alert("Server error");
+      toast.error("Server error");
     }
   }
 
