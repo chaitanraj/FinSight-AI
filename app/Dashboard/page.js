@@ -18,6 +18,7 @@ import {
   Film,
   Zap
 } from 'lucide-react';
+import AddExpenseModal from '@/components/AddExpenseModal/page'
 
 const PieChart = ({ data, total }) => {
   const [hoveredSegment, setHoveredSegment] = useState(null);
@@ -150,6 +151,9 @@ const RecentExpenseRow = ({ date, merchant, amount, category, categoryColor }) =
   </motion.div>
 );
 
+
+
+
 export default function Dashboard() {
   const [expenses, setExpenses] = useState([]);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
@@ -223,7 +227,7 @@ export default function Dashboard() {
 
   return (
     <div>
-     {/* <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-emerald-950/20"> */}
+      {/* <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-emerald-950/20"> */}
       <nav className="border-b border-gray-800 backdrop-blur-xl sticky top-0 z-[50]">
         <div className="max-w-5xl mx-auto px-6 py-4 flex mt-[2vh] items-center justify-between">
           <h1 className="text-2xl font-bold text-white ">Dashboard</h1>
@@ -306,7 +310,7 @@ export default function Dashboard() {
                       <div className="flex-1">
                         <p className="text-sm font-medium text-white">{item.category}</p>
                         <p className="text-xs text-gray-400">
-                         ${item.amount.toFixed(2)} ({((item.amount / stats.totalSpending) * 100).toFixed(1)}%)
+                          ${item.amount.toFixed(2)} ({((item.amount / stats.totalSpending) * 100).toFixed(1)}%)
                         </p>
                       </div>
                     </motion.div>
@@ -336,21 +340,19 @@ export default function Dashboard() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.4 + index * 0.1 }}
                   whileHover={{ scale: 1.02 }}
-                  className={`p-4 rounded-xl border ${
-                    insight.type === 'warning'
+                  className={`p-4 rounded-xl border ${insight.type === 'warning'
                       ? 'bg-yellow-500/10 border-yellow-500/30'
                       : insight.type === 'success'
-                      ? 'bg-emerald-500/10 border-emerald-500/30'
-                      : 'bg-blue-500/10 border-blue-500/30'
-                  }`}
+                        ? 'bg-emerald-500/10 border-emerald-500/30'
+                        : 'bg-blue-500/10 border-blue-500/30'
+                    }`}
                 >
-                  <insight.icon className={`w-5 h-5 mb-3 ${
-                    insight.type === 'warning'
+                  <insight.icon className={`w-5 h-5 mb-3 ${insight.type === 'warning'
                       ? 'text-yellow-400'
                       : insight.type === 'success'
-                      ? 'text-emerald-400'
-                      : 'text-blue-400'
-                  }`} />
+                        ? 'text-emerald-400'
+                        : 'text-blue-400'
+                    }`} />
                   <p className="text-sm text-gray-300 leading-relaxed">{insight.message}</p>
                 </motion.div>
               ))}
@@ -418,30 +420,10 @@ export default function Dashboard() {
 
       <AnimatePresence>
         {isAddExpenseOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setIsAddExpenseOpen(false)}
-            className="fixed inset-0 cursor-pointer bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-gray-900 border cursor-pointer border-gray-800 rounded-2xl p-6 max-w-md w-full"
-            >
-              <h3 className="text-2xl font-bold cursor-pointer text-white mb-4">Add Expense</h3>
-              <p className="text-gray-400 mb-4">Expense form will be implemented here</p>
-              <button
-                onClick={() => setIsAddExpenseOpen(false)}
-                className="w-full cursor-pointer bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-lg font-semibold transition-colors"
-              >
-                Close
-              </button>
-            </motion.div>
-          </motion.div>
+          <AddExpenseModal
+            open={isAddExpenseOpen}
+            onClose={() => setIsAddExpenseOpen(false)}
+          />
         )}
       </AnimatePresence>
     </div>
