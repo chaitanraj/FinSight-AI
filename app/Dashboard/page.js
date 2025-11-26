@@ -224,7 +224,6 @@ export default function Dashboard() {
 
   return (
     <div>
-      {/* <div className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-emerald-950/20"> */}
       <nav className="border-b border-gray-800 backdrop-blur-xl sticky top-0 z-[50]">
         <div className="max-w-5xl mx-auto px-6 py-4 flex mt-[2vh] items-center justify-between">
           <h1 className="text-2xl font-bold text-white ">Dashboard</h1>

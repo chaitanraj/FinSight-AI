@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import { X, Check } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { toast } from "react-toastify";
 import { CalendarIcon } from "lucide-react";
 
 export default function AddExpenseModal({ open, onClose }) {
@@ -64,13 +65,14 @@ export default function AddExpenseModal({ open, onClose }) {
       method: "POST",
       body: JSON.stringify(payload),
     });
+     toast.success("Expense Added")
     onClose();
   }
 
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[55] flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
@@ -84,10 +86,10 @@ export default function AddExpenseModal({ open, onClose }) {
           <X className="w-7 h-7 cursor-pointer" />
         </button>
 
-        {/* Title */}
+       
         <h2 className="text-2xl font-bold text-white mb-6">Add Expense</h2>
 
-        {/* Form */}
+       
         <div className="space-y-4">
           {/* Merchant */}
           <div>
@@ -128,7 +130,7 @@ export default function AddExpenseModal({ open, onClose }) {
                   <CalendarIcon className="w-4 cursor-pointer h-4 text-slate-400" />
                 </button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto cursor-pointer p-0 text-gray-200 bg-slate-900 border-slate-700">
+              <PopoverContent className="w-auto z-[999] cursor-pointer p-0 text-gray-200 bg-slate-900 border-slate-700">
                 <Calendar
                   mode="single"
                   className="cursor-pointer"
