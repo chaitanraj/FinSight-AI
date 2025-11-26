@@ -21,7 +21,6 @@ export default function Home() {
         {/* Hero Section */}
         <section className="pt-16 pb-20 lg:pt-24 lg:pb-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-
             {/* Left Content */}
             <div
               className={`transition-all duration-1000 transform ${
@@ -144,8 +143,6 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-
-                {/* Secondary Phone - Stats */}
                 <div className="absolute -right-4 top-32 bg-white rounded-3xl shadow-xl p-4 w-40 transform hover:scale-105 transition-transform duration-500 hidden lg:block">
                   <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-4 text-white">
                     <BarChart3 className="w-6 h-6 mb-2" />

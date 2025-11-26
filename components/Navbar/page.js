@@ -1,10 +1,11 @@
 "use client"
 import Link from 'next/link'
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { ChevronDown, LogOut, Compass } from 'lucide-react';
+import { ChevronDown, LogOut, Compass, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { AuthContext } from "@/context/AuthContext";
+import SettingsModal from "@/components/SettingsModal/page"
 
 const page = () => {
   const [activeItem, setactiveItem] = useState('');
@@ -12,6 +13,7 @@ const page = () => {
   const navRef = useRef(null);
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const { isLoggedIn, username, login, logout } = useContext(AuthContext);
   const dropdownRef = useRef(null);
   const [loggingOut, setLoggingOut] = useState(false);
@@ -49,7 +51,7 @@ const page = () => {
 
   return (
     <div>
-      <div className='flex justify-center'>
+      <div className='flex justify-center relative z-[51]'>
         <div className='border-b text-md font-normal border-emerald-700/30 bg-zinc-800/60 backdrop-blur-sm mt-[5vh] h-[8vh] w-[150vh] rounded-3xl shadow-lg shadow-emerald-500/5 transition-all duration-300 hover:shadow-emerald-500/10'>
           <div className="flex items-center h-full justify-between text-white px-6">
             <div className='flex items-center h-full'>
@@ -103,14 +105,14 @@ const page = () => {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 cursor-pointer"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 cursor-pointer z-50"
                   >
                     <span>{username}</span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden ">
                       <button
                         onClick={() => {
                           setIsDropdownOpen(false);
@@ -120,6 +122,19 @@ const page = () => {
                         <Compass className="w-4 h-4" />
                         <span className="font-medium cursor-pointer">Explore</span>
                       </button>
+                      
+                      {/* Settings Button */}
+                      <button
+                        onClick={() => {
+                          setShowSettings(true);
+                          setIsDropdownOpen(false);
+                        }}
+                        className="w-full px-4 py-3 flex items-center gap-3 hover:bg-emerald-50 transition-colors duration-200 text-gray-700 hover:text-emerald-700 border-t border-gray-100 cursor-pointer"
+                      >
+                        <Settings className="w-4 h-4" />
+                        <span className="font-medium">Settings</span>
+                      </button>
+                      
                       <button
                         onClick={handleLogout}
                         disabled={loggingOut}
@@ -134,7 +149,6 @@ const page = () => {
                           </>
                         )}
                       </button>
-
                     </div>
                   )}
                 </div>
@@ -143,6 +157,11 @@ const page = () => {
           </div>
         </div>
       </div>
+      
+      {/* Settings Modal */}
+      {showSettings && (
+        <SettingsModal onClose={() => setShowSettings(false)} />
+      )}
     </div>
   )
 }

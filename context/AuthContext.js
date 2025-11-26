@@ -1,11 +1,28 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+
 export const AuthContext = createContext();
+export const currencies = [
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+];
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState(null);
+  const [currency, setCurrencyState] = useState('INR');
+
+ 
+  useEffect(() => {
+    const savedCurrency = localStorage.getItem('preferredCurrency');
+    if (savedCurrency) {
+      setCurrencyState(savedCurrency);
+    }
+  }, []);
 
   useEffect(() => {
     const verifyLogin = async () => {
@@ -52,8 +69,33 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const setCurrency = (newCurrency) => {
+    setCurrencyState(newCurrency);
+    localStorage.setItem('preferredCurrency', newCurrency);
+  };
+
+  const getCurrencySymbol = () => {
+    return currencies.find(c => c.code === currency)?.symbol || '₹';
+  };
+
+  const getCurrencyData = () => {
+    return currencies.find(c => c.code === currency) || currencies[0];
+  };
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, username, login, logout }}>
+    <AuthContext.Provider 
+      value={{ 
+        isLoggedIn, 
+        username, 
+        login, 
+        logout,
+        currency,
+        setCurrency,
+        getCurrencySymbol,
+        getCurrencyData,
+        currencies
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
