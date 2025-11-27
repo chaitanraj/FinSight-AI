@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { AuthContext } from "@/context/AuthContext";
 import SettingsModal from "@/components/SettingsModal/page"
+import {toast} from 'react-toastify';
 
 const page = () => {
   const [activeItem, setactiveItem] = useState('');
@@ -24,6 +25,7 @@ const page = () => {
     setIsDropdownOpen(false);
     setLoggingOut(false);
     router.push("/");
+    toast.success("Logged Out")
   };
 
   useEffect(() => {

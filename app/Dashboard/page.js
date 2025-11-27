@@ -18,6 +18,11 @@ import {
   Film,
   Zap
 } from 'lucide-react';
+import {
+  Car,
+  HeartPulse,
+  HelpCircle
+} from "lucide-react";
 import AddExpenseModal from '@/components/AddExpenseModal/page'
 
 const PieChart = ({ data, total }) => {
@@ -160,13 +165,81 @@ export default function Dashboard() {
     categoryBreakdown: []
   });
 
+  async function fetchExpense() {
+    try {
+      const res = await fetch('/api/get-expense');
+
+      if (!res.ok) return null;
+      const data = await res.json();
+      setExpenses(data);
+      return data;
+
+    } catch (err) {
+      console.log("Error fetching /api/get-expense:", err);
+      return null;
+    }
+  }
+  useEffect(() => {
+    fetchExpense();
+  }, []);
+
+  function capitalize(str) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  }
+
+
   const categoryConfig = {
-    'Shopping': { color: 'bg-blue-500', icon: ShoppingCart, chartColor: '#3b82f6' },
-    'Food': { color: 'bg-emerald-500', icon: Coffee, chartColor: '#10b981' },
-    'Transport': { color: 'bg-yellow-500', icon: Plane, chartColor: '#eab308' },
-    'Housing': { color: 'bg-purple-500', icon: Home, chartColor: '#a855f7' },
-    'Entertainment': { color: 'bg-pink-500', icon: Film, chartColor: '#ec4899' },
-    'Utilities': { color: 'bg-orange-500', icon: Zap, chartColor: '#f97316' }
+    Groceries: {
+      color: "bg-green-600",
+      icon: ShoppingCart,
+      chartColor: "#16a34a"
+    },
+    Food: {
+      color: "bg-emerald-500",
+      icon: Coffee,
+      chartColor: "#10b981"
+    },
+    Transport: {
+      color: "bg-yellow-500",
+      icon: Car,
+      chartColor: "#eab308"
+    },
+    Shopping: {
+      color: "bg-blue-500",
+      icon: ShoppingCart,
+      chartColor: "#3b82f6"
+    },
+    Utilities: {
+      color: "bg-orange-500",
+      icon: Zap,
+      chartColor: "#f97316"
+    },
+    Rent: {
+      color: "bg-violet-600",
+      icon: Home,
+      chartColor: "#7c3aed"
+    },
+    Entertainment: {
+      color: "bg-pink-500",
+      icon: Film,
+      chartColor: "#ec4899"
+    },
+    Health: {
+      color: "bg-red-500",
+      icon: HeartPulse,
+      chartColor: "#ef4444"
+    },
+    Travel: {
+      color: "bg-cyan-500",
+      icon: Plane,
+      chartColor: "#06b6d4"
+    },
+    Other: {
+      color: "bg-gray-500",
+      icon: HelpCircle,
+      chartColor: "#6b7280"
+    }
   };
 
   useEffect(() => {
@@ -174,19 +247,9 @@ export default function Dashboard() {
   }, []);
 
   const loadExpenses = async () => {
-    const mockExpenses = [
-      { id: 1, date: 'Nov 22', merchant: 'Amazon', amount: 156.78, category: 'Shopping' },
-      { id: 2, date: 'Nov 21', merchant: 'Starbucks', amount: 12.50, category: 'Food' },
-      { id: 3, date: 'Nov 20', merchant: 'Uber', amount: 34.20, category: 'Transport' },
-      { id: 4, date: 'Nov 19', merchant: 'Target', amount: 89.99, category: 'Shopping' },
-      { id: 5, date: 'Nov 18', merchant: 'Netflix', amount: 15.99, category: 'Entertainment' },
-    ];
+    const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
-    setExpenses(mockExpenses);
-
-    const total = mockExpenses.reduce((sum, exp) => sum + exp.amount, 0);
-
-    const categoryTotals = mockExpenses.reduce((acc, exp) => {
+    const categoryTotals = expenses.reduce((acc, exp) => {
       acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
       return acc;
     }, {});
@@ -337,17 +400,17 @@ export default function Dashboard() {
                   transition={{ delay: 0.4 + index * 0.1 }}
                   whileHover={{ scale: 1.02 }}
                   className={`p-4 rounded-xl border ${insight.type === 'warning'
-                      ? 'bg-red-500/20 border-red-500/30'
-                      : insight.type === 'success'
-                        ? 'bg-emerald-500/10 border-emerald-500/30'
-                        : 'bg-blue-500/10 border-blue-500/30'
+                    ? 'bg-red-500/20 border-red-500/30'
+                    : insight.type === 'success'
+                      ? 'bg-emerald-500/10 border-emerald-500/30'
+                      : 'bg-blue-500/10 border-blue-500/30'
                     }`}
                 >
                   <insight.icon className={`w-5 h-5 mb-3 ${insight.type === 'warning'
-                      ? 'text-yellow-400'
-                      : insight.type === 'success'
-                        ? 'text-emerald-400'
-                        : 'text-blue-400'
+                    ? 'text-yellow-400'
+                    : insight.type === 'success'
+                      ? 'text-emerald-400'
+                      : 'text-blue-400'
                     }`} />
                   <p className="text-sm text-gray-300 leading-relaxed">{insight.message}</p>
                 </motion.div>
@@ -401,10 +464,13 @@ export default function Dashboard() {
                   transition={{ delay: 0.6 + index * 0.05 }}
                 >
                   <RecentExpenseRow
-                    date={expense.date}
+                    date={new Date(expense.date).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric"
+                    })}
                     merchant={expense.merchant}
                     amount={expense.amount}
-                    category={expense.category}
+                    category={capitalize(expense.category)}
                     categoryColor={`${categoryConfig[expense.category]?.color} bg-opacity-20 text-white`}
                   />
                 </motion.div>

@@ -35,7 +35,7 @@ export default function RootLayout({ children }) {
         {children}
         <ToastContainer
           position="top-right"
-          autoClose={1500}
+          autoClose={1000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick
@@ -43,7 +43,7 @@ export default function RootLayout({ children }) {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-          theme="dark"
+          theme="light"
         />
         <Footer />
         </AuthProvider>
