@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useRef } from 'react';
 import { X, Check } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
@@ -7,8 +7,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { toast } from "react-toastify";
 import { CalendarIcon } from "lucide-react";
 import { getexpense } from '@/lib/getexpense';
+import { AuthContext } from '@/context/AuthContext';
 
 export default function AddExpenseModal({ open, onClose }) {
+  const {getexpense,expenses}=useContext(AuthContext);
   const [merchant, setMerchant] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');

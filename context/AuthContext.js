@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState(null);
   const [currency, setCurrencyState] = useState('INR');
-
+  const[expenses,setExpenses]=useState([])
  
   useEffect(() => {
     const savedCurrency = localStorage.getItem('preferredCurrency');
@@ -44,6 +44,20 @@ export const AuthProvider = ({ children }) => {
 
     verifyLogin();
   }, []);
+
+  async function getexpense() {
+    try {
+      const res = await fetch('/api/get-expense');
+      if (!res.ok) return null;
+      const data = await res.json();
+      setExpenses(data);
+      return data;
+
+    } catch (err) {
+      console.log("Error fetching /api/get-expense:", err);
+      return null;
+    }
+  }
 
   const login = (userData) => {
     setUsername(userData.name);
@@ -94,7 +108,9 @@ export const AuthProvider = ({ children }) => {
         setCurrency,
         getCurrencySymbol,
         getCurrencyData,
-        currencies
+        currencies,
+        expenses,
+        getexpense
       }}
     >
       {children}

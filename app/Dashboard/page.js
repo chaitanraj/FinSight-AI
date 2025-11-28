@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -24,6 +24,7 @@ import {
   HelpCircle
 } from "lucide-react";
 import AddExpenseModal from '@/components/AddExpenseModal/page'
+import { AuthContext } from '@/context/AuthContext';
 import { getexpense } from '@/lib/getexpense';
 
 const PieChart = ({ data, total }) => {
@@ -158,28 +159,14 @@ const RecentExpenseRow = ({ date, merchant, amount, category, categoryColor }) =
 );
 
 export default function Dashboard() {
-  const [expenses, setExpenses] = useState([]);
+  // const [expenses, setExpenses] = useState([]);
+  const {getexpense,expenses}=useContext(AuthContext);
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [stats, setStats] = useState({
     totalSpending: 0,
     monthlyChange: 0,
     categoryBreakdown: []
   });
-
-  // export async function fetchExpense() {
-  //   try {
-  //     const res = await fetch('/api/get-expense');
-
-  //     if (!res.ok) return null;
-  //     const data = await res.json();
-  //     setExpenses(data);
-  //     return data;
-
-  //   } catch (err) {
-  //     console.log("Error fetching /api/get-expense:", err);
-  //     return null;
-  //   }
-  // }
 
   async function fetchExpense() {
     const data = await getexpense();
