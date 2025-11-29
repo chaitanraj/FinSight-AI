@@ -5,7 +5,7 @@ export function middleware(request) {
     return NextResponse.rewrite(new URL('/', request.url))
   }
  
-  if (request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/Login', request.url))
-  }
+  // if (request.nextUrl.pathname.startsWith('/Dashboard')) {
+  //   return NextResponse.redirect(new URL('/Login', request.url))
+  // }
 }

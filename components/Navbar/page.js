@@ -15,7 +15,7 @@ const page = () => {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const { isLoggedIn, username, login, logout } = useContext(AuthContext);
+  const { isLoggedIn, login, logout, user } = useContext(AuthContext);
   const dropdownRef = useRef(null);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -97,7 +97,7 @@ const page = () => {
             <div className="flex items-center h-full">
               {!isLoggedIn ? (
                 <button className="relative px-6 py-2.5 bg-gradient-to-r cursor-pointer from-emerald-600 to-emerald-700 rounded-xl font-medium overflow-hidden group transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 active:scale-95">
-                  <Link href="/Signup" className='cursor-pointer'>
+                  <Link href="/Login" className='cursor-pointer'>
                     <span className="relative z-10">Login/Signup</span>
                     <span className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                     <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></span>
@@ -109,7 +109,7 @@ const page = () => {
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                     className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 cursor-pointer z-50"
                   >
-                    <span>{username}</span>
+                    <span>{user.name}</span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 

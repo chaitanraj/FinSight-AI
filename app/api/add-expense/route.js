@@ -5,16 +5,16 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    if (!body.merchant || !body.amount)
-    {
+    if (!body.merchant || !body.amount || !body.userId) {
       return NextResponse.json(
-        { error: "merchant and amount required" },
+        { error: "merchant, amount, and userId are required" },
         { status: 400 }
       );
     }
+
     const expense = await prisma.expense.create({
       data: {
-        userId: body.userId ? Number(body.userId) : null,
+        userId: Number(body.userId),
         merchant: body.merchant,
         amount: Number(body.amount),
         category: body.category || null,

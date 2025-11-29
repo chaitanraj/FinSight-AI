@@ -14,9 +14,10 @@ export const currencies = [
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState(null);
+  const [user, setUser] = useState(null);
   const [currency, setCurrencyState] = useState('INR');
-  const[expenses,setExpenses]=useState([])
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const [expenses,setExpenses]=useState([])
  
   useEffect(() => {
     const savedCurrency = localStorage.getItem('preferredCurrency');
@@ -34,34 +35,56 @@ export const AuthProvider = ({ children }) => {
         });
         if (res.ok) {
           const data = await res.json();
+          setUser(data);
           setIsLoggedIn(true);
-          setUsername(data.name);
+          fetchExpensesForUser(data.id);
         }
       } catch (error) {
         console.error("AuthContext Error:", error);
+      } finally {
+        setIsAuthChecking(false);
       }
     };
 
     verifyLogin();
   }, []);
 
-  async function getexpense() {
+  // ADD this new function BEFORE getexpense():
+  async function fetchExpensesForUser(userId) {
+    if (!userId) {
+      setExpenses([]);
+      return [];
+    }
+
     try {
-      const res = await fetch('/api/get-expense');
+      const res = await fetch(`/api/get-expense?userId=${userId}`);
       if (!res.ok) return null;
       const data = await res.json();
       setExpenses(data);
       return data;
-
     } catch (err) {
-      console.log("Error fetching /api/get-expense:", err);
+      console.log("Error fetching expenses:", err);
       return null;
     }
   }
 
+  async function getexpense() {
+    if (!user?.id || !isLoggedIn) {
+      console.log("No user logged in");
+      setExpenses([]);
+      return [];
+    }
+
+    return fetchExpensesForUser(user.id);
+  }
+
   const login = (userData) => {
-    setUsername(userData.name);
+    setUser(userData);
     setIsLoggedIn(true);
+
+    if (userData.id) {
+      fetchExpensesForUser(userData.id);
+    }
   };
 
   const logout = async () => {
@@ -80,7 +103,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Error during logout:", err);
     } finally {
       setIsLoggedIn(false);
-      setUsername(null);
+      setUser(null);
     }
   };
 
@@ -101,16 +124,17 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider 
       value={{ 
         isLoggedIn, 
-        username, 
         login, 
         logout,
+        user,
         currency,
         setCurrency,
         getCurrencySymbol,
         getCurrencyData,
         currencies,
         expenses,
-        getexpense
+        getexpense,
+        isAuthChecking
       }}
     >
       {children}

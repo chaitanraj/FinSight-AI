@@ -9,7 +9,7 @@ import { CalendarIcon } from "lucide-react";
 import { AuthContext } from '@/context/AuthContext';
 
 export default function AddExpenseModal({ open, onClose }) {
-  const {getexpense,expenses}=useContext(AuthContext);
+  const {getexpense,expenses,user}=useContext(AuthContext);
   const [merchant, setMerchant] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
@@ -55,22 +55,42 @@ export default function AddExpenseModal({ open, onClose }) {
     setAiDetected(false);
   }
 
-  async function handleAddExpense() {
-    const payload = {
-      merchant,
-      amount,
-      date,
-      category,
-    };
+ async function handleAddExpense() {
+  // ✅ ADD: Check if user is logged in
+  if (!user?.id) {
+    toast.error("You must be logged in to add expenses");
+    return;
+  }
 
-    await fetch("/api/add-expense", {
+  const payload = {
+    merchant,
+    amount,
+    date,
+    category,
+    userId: user.id,
+  };
+
+  try {
+    const res = await fetch("/api/add-expense", {
       method: "POST",
+      headers: {
+        'Content-Type': 'application/json', 
+      },
       body: JSON.stringify(payload),
     });
-     toast.success("Expense Added")
-     await getexpense();
+
+    if (!res.ok) {
+      throw new Error('Failed to add expense');
+    }
+
+    toast.success("Expense Added");
+    await getexpense();
     onClose();
+  } catch (error) {
+    console.error("Error adding expense:", error);
+    toast.error("Failed to add expense");
   }
+}
 
   if (!open) return null;
 

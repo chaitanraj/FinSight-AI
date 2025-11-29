@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect, useContext, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -27,7 +26,9 @@ import {
 } from "lucide-react";
 import AddExpenseModal from '@/components/AddExpenseModal/page'
 import { AuthContext } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
+ 
 const PieChart = ({ data, total }) => {
   const [hoveredSegment, setHoveredSegment] = useState(null);
   
@@ -158,17 +159,25 @@ const RecentExpenseRow = ({ date, merchant, amount, category, categoryColor }) =
 );
 
 export default function Dashboard() {
-  const { getexpense, expenses } = useContext(AuthContext);
+  const { getexpense, expenses, isAuthChecking, user } = useContext(AuthContext);
+  const router = useRouter();
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
-
-  async function fetchExpense() {
-    const data = await getexpense();
-    return data;
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400 text-lg">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  if (!user) {
+    router.push('/Login');
+    return null;
   }
 
-  useEffect(() => {
-    getexpense();
-  }, []);
 
   function capitalize(str) {
     if (!str) return "";
@@ -237,16 +246,16 @@ export default function Dashboard() {
       };
     }
 
-    // Total spending
+
     const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
 
-    // Category → amount mapping
+
     const categoryTotals = expenses.reduce((acc, exp) => {
       acc[exp.category] = (acc[exp.category] || 0) + exp.amount;
       return acc;
     }, {});
 
-    // Breakdown array for pie chart
+
     const breakdown = Object.entries(categoryTotals).map(([category, amount]) => ({
       category,
       amount,
@@ -306,7 +315,7 @@ export default function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h2 className="text-4xl font-bold text-white mb-2">Welcome back!</h2>
+          <h2 className="text-4xl font-bold text-white mb-2">Welcome back {user.name}!</h2>
           <p className="text-gray-400 text-lg">Here's a summary of your spending this month</p>
         </motion.div>
 
@@ -354,8 +363,8 @@ export default function Dashboard() {
 
                 {/* Dynamic Legend - switches to 2 columns when > 5 items */}
                 <div className={`${stats.categoryBreakdown.length > 5
-                    ? 'grid grid-cols-2 gap-x-8 gap-y-3'
-                    : 'space-y-3'
+                  ? 'grid grid-cols-2 gap-x-8 gap-y-3'
+                  : 'space-y-3'
                   }`}>
                   {stats.categoryBreakdown.map((item, index) => (
                     <motion.div
