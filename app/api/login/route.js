@@ -27,17 +27,28 @@ export async function POST(req) {
       { expiresIn: "7d" }
     );
 
-    const cookieStore = await cookies();
-    cookieStore.set({
-      name: "token",
-      value: token,
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 7 * 24 * 60 * 60, 
+   const res = NextResponse.json({
+      message: "Login successful",
+      user: {id: user.id, name: user.name, email: user.email },
     });
 
-    return NextResponse.json({ message: "Login successful", user: { name: user.name, email: user.email } });
+    res.cookies.set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60,
+    });
+    console.log("🍪 Setting cookie:", {
+      name: "token",
+      value: token.substring(0, 20) + "...",
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    return res;
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

@@ -13,24 +13,65 @@ export const currencies = [
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [currency, setCurrencyState] = useState("INR");
 
+  // Load currency preference
   useEffect(() => {
     const saved = localStorage.getItem("preferredCurrency");
     if (saved) setCurrencyState(saved);
   }, []);
 
+  // Check authentication on mount
+  useEffect(() => {
+    const verifyAuth = async () => {
+      try {
+        const res = await fetch("/api/proxy", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.loggedIn) {
+            setUser({ id: data.id, name: data.name });
+            setIsLoggedIn(true);
+            console.log("✅ User authenticated:", data.name);
+          } else {
+            setUser(null);
+            setIsLoggedIn(false);
+            console.log("❌ User not authenticated");
+          }
+        } else {
+          setUser(null);
+          setIsLoggedIn(false);
+          console.log("❌ Auth check failed:", res.status);
+        }
+      } catch (error) {
+        console.error("❌ Auth verification error:", error);
+        setUser(null);
+        setIsLoggedIn(false);
+      } finally {
+        setIsAuthChecking(false);
+      }
+    };
+
+    verifyAuth();
+  }, []);
+
   const login = (userData) => {
     setUser(userData);
     setIsLoggedIn(true);
+    console.log("✅ User logged in:", userData.name);
   };
 
   const logout = async () => {
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout`, {
+      await fetch("/api/logout", {
         method: "POST",
         credentials: "include",
       });
+      console.log("✅ User logged out");
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
@@ -55,6 +96,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         isLoggedIn,
+        isAuthChecking,
         login,
         logout,
         currency,

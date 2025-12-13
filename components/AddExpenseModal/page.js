@@ -1,33 +1,39 @@
 'use client';
-import { useContext, useState } from 'react';
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import { X, Check } from 'lucide-react';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "react-toastify";
 import { CalendarIcon } from "lucide-react";
-import { AuthContext } from '@/context/AuthContext';
 
-export default function AddExpenseModal({ open, onClose }) {
-  const {getexpense,expenses,user}=useContext(AuthContext);
+export default function AddExpenseModal({ open, onClose, onSuccess, userId }) {
   const [merchant, setMerchant] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
   const [category, setCategory] = useState('');
   const [AiDetected, setAiDetected] = useState(false);
   const [overrode, setOverrode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function fetchAPI(merchant) {
-    const res = await fetch('/api/category-guesser', {
-      method: "POST",
-      body: JSON.stringify({ "text": merchant })
-    });
-    const data = await res.json();
-    if (data.category) {
-      setCategory(data.category);
-      setAiDetected(true);
+    try {
+      const res = await fetch('/api/category-guesser', {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ "text": merchant })
+      });
+      const data = await res.json();
+      if (data.category) {
+        setCategory(data.category);
+        setAiDetected(true);
+      }
+    } catch (error) {
+      console.error("Error fetching category:", error);
     }
   }
+
   const debounceTimer = useRef(null);
 
   const handleMerchantChange = (e) => {
@@ -41,13 +47,14 @@ export default function AddExpenseModal({ open, onClose }) {
       setOverrode(false);
     }
     if (overrode) return;
+    
     clearTimeout(debounceTimer.current);
     if (value.length >= 3) {
       debounceTimer.current = setTimeout(() => {
         fetchAPI(value);
       }, 200);
     }
-  }
+  };
 
   function handleCategoryChange(e) {
     setCategory(e.target.value);
@@ -55,41 +62,76 @@ export default function AddExpenseModal({ open, onClose }) {
     setAiDetected(false);
   }
 
- async function handleAddExpense() {
-  if (!user?.id) {
-    toast.error("You must be logged in to add expenses");
-    return;
-  }
-
-  const payload = {
-    merchant,
-    amount,
-    date,
-    category,
-    userId: user.id,
-  };
-
-  try {
-    const res = await fetch("/api/add-expense", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json', 
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      throw new Error('Failed to add expense');
+  async function handleAddExpense() {
+    if (!merchant.trim()) {
+      toast.error("Please enter a description");
+      return;
+    }
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
+      toast.error("Please enter a valid amount");
+      return;
+    }
+    if (!date) {
+      toast.error("Please select a date");
+      return;
+    }
+    if (!category) {
+      toast.error("Please select a category");
+      return;
+    }
+    if (!userId) {
+      toast.error("You must be logged in to add expenses");
+      return;
     }
 
-    toast.success("Expense Added");
-    await getexpense();
-    onClose();
-  } catch (error) {
-    console.error("Error adding expense:", error);
-    toast.error("Failed to add expense");
+    const payload = {
+      merchant: merchant.trim(),
+      amount: parseFloat(amount),
+      date,
+      category,
+      userId: userId,
+    };
+
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch("/api/add-expense", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Important for cookie-based auth
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message || 'Failed to add expense');
+      }
+
+      toast.success("Expense added successfully!");
+      
+      // Reset form
+      setMerchant('');
+      setAmount('');
+      setDate('');
+      setCategory('');
+      setAiDetected(false);
+      setOverrode(false);
+      
+      // Call success callback to refresh data
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error adding expense:", error);
+      toast.error(error.message || "Failed to add expense");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
-}
 
   if (!open) return null;
 
@@ -100,18 +142,17 @@ export default function AddExpenseModal({ open, onClose }) {
         onClick={onClose}
       />
 
-      <div className="relative w-full max-w-md bg-gradient-to-b from-slate-950 to-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-6"  >
+      <div className="relative w-full max-w-md bg-gradient-to-b from-slate-950 to-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-6">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-400 hover:text-slate-200 transition-colors"
+          disabled={isSubmitting}
         >
           <X className="w-7 h-7 cursor-pointer" />
         </button>
 
-       
         <h2 className="text-2xl font-bold text-white mb-6">Add Expense</h2>
 
-       
         <div className="space-y-4">
           {/* Merchant */}
           <div>
@@ -124,18 +165,22 @@ export default function AddExpenseModal({ open, onClose }) {
               onChange={handleMerchantChange}
               placeholder="e.g., Pizza, Uber Ride, Movie"
               className="w-full bg-slate-800 text-white text-sm px-4 py-3 rounded-lg border border-slate-700 focus:outline-none focus:border-slate-600 transition-colors"
+              disabled={isSubmitting}
             />
           </div>
-          {/* Amount  */}
+
+          {/* Amount */}
           <div>
             <label className="block text-slate-300 text-sm mb-2">
               Amount
             </label>
             <input
-              type="text"
+              type="String"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
+              placeholder="0.00"
               className="w-full bg-slate-800 text-white text-sm px-4 py-3 rounded-lg border border-slate-700 focus:outline-none focus:border-slate-600 transition-colors"
+              disabled={isSubmitting}
             />
           </div>
 
@@ -146,7 +191,10 @@ export default function AddExpenseModal({ open, onClose }) {
             </label>
             <Popover>
               <PopoverTrigger asChild>
-                <button className="w-full cursor-pointer bg-slate-800 text-white text-sm px-4 py-3 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors flex items-center justify-between text-left">
+                <button 
+                  className="w-full cursor-pointer bg-slate-800 text-white text-sm px-4 py-3 rounded-lg border border-slate-700 hover:border-slate-600 transition-colors flex items-center justify-between text-left"
+                  disabled={isSubmitting}
+                >
                   <span className={!date ? "text-slate-400" : ""}>
                     {date ? new Date(date + 'T00:00:00').toLocaleDateString() : "Select date"}
                   </span>
@@ -177,16 +225,15 @@ export default function AddExpenseModal({ open, onClose }) {
             <label className="block cursor-pointer text-slate-300 text-sm mb-2">
               Category
             </label>
-
             <select
               value={category}
               onChange={handleCategoryChange}
               className="w-full cursor-pointer bg-slate-900 text-white text-sm px-4 py-3 rounded-lg border border-slate-700 focus:outline-none focus:border-slate-600 transition-colors"
+              disabled={isSubmitting}
             >
               <option value="" disabled>
                 {AiDetected ? "Detected by AI" : "Select a category"}
               </option>
-
               <option value="Groceries">Groceries</option>
               <option value="Food">Food</option>
               <option value="Transport">Transport</option>
@@ -200,9 +247,8 @@ export default function AddExpenseModal({ open, onClose }) {
             </select>
           </div>
 
-
           {/* AI Detection Indicator */}
-          {(AiDetected) ?
+          {AiDetected && (
             <div className="flex items-center gap-2">
               <div className="flex items-center justify-center w-5 h-5 bg-teal-500 rounded-full">
                 <Check className="w-3 h-3 text-white" />
@@ -211,22 +257,24 @@ export default function AddExpenseModal({ open, onClose }) {
                 Automatically detected by AI
               </span>
             </div>
-            : <></>}
+          )}
         </div>
 
         {/* Action Buttons */}
         <div className="flex gap-3 mt-6">
           <button
             onClick={onClose}
-            className="flex-1 bg-slate-800 cursor-pointer text-white text-sm font-medium px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700"
+            className="flex-1 bg-slate-800 cursor-pointer text-white text-sm font-medium px-4 py-3 rounded-lg hover:bg-slate-700 transition-colors border border-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSubmitting}
           >
             Cancel
           </button>
           <button
             onClick={handleAddExpense}
-            className="flex-1 bg-teal-600 text-white cursor-pointer text-sm font-medium px-4 py-3 rounded-lg hover:bg-teal-700 transition-colors"
+            className="flex-1 bg-teal-600 text-white cursor-pointer text-sm font-medium px-4 py-3 rounded-lg hover:bg-teal-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSubmitting}
           >
-            Add Expense
+            {isSubmitting ? "Adding..." : "Add Expense"}
           </button>
         </div>
       </div>

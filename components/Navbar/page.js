@@ -15,16 +15,18 @@ const page = () => {
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const { isLoggedIn, login, logout, user } = useContext(AuthContext);
+  const { isLoggedIn, isAuthChecking, login, logout, user } = useContext(AuthContext);
   const dropdownRef = useRef(null);
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = async (e) => {
+    e.preventDefault();
     setLoggingOut(true);
     await logout();
     setIsDropdownOpen(false);
     setLoggingOut(false);
     router.push("/");
+     router.refresh();
     toast.success("Logged Out")
   };
 

@@ -13,7 +13,6 @@ export async function GET(req) {
       new TextEncoder().encode(process.env.JWT_SECRET)
     );
 
-    // Return user info
     return Response.json({
       loggedIn: true,
       name: payload.name,
