@@ -23,7 +23,6 @@ import {
 } from 'lucide-react';
 import AddExpenseModal from '@/components/AddExpenseModal/page';
 
-// Move categoryConfig outside component - it never changes
 const categoryConfig = {
   Groceries: {
     color: "bg-purple-500",
@@ -210,7 +209,6 @@ export default function Dashboard({ user, expenses = [] }) {
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const router = useRouter();
 
-  // Memoized stats calculation
   const stats = useMemo(() => {
     if (!expenses || expenses.length === 0) {
       return {
@@ -244,10 +242,10 @@ export default function Dashboard({ user, expenses = [] }) {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
 
-  // Handler for when expense is added - refresh the page to get new data
+  
   const handleExpenseAdded = () => {
     setIsAddExpenseOpen(false);
-    router.refresh(); // This triggers server component to refetch data
+    router.refresh();
   };
 
   const aiInsights = [

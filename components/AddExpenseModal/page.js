@@ -154,7 +154,6 @@ export default function AddExpenseModal({ open, onClose, onSuccess, userId }) {
         <h2 className="text-2xl font-bold text-white mb-6">Add Expense</h2>
 
         <div className="space-y-4">
-          {/* Merchant */}
           <div>
             <label className="block text-slate-300 text-sm mb-2">
               Description
