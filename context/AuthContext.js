@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useCallback } from "react";
 
 export const AuthContext = createContext();
 
@@ -15,57 +15,66 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [currency, setCurrencyState] = useState("INR");
+
   useEffect(() => {
     const saved = localStorage.getItem("preferredCurrency");
     if (saved) setCurrencyState(saved);
   }, []);
 
-  useEffect(() => {
-    const verifyAuth = async () => {
-      try {
-        const res = await fetch("/api/proxy", {
-          method: "GET",
-          credentials: "include",
-        });
-        if (res.status === 401) {
-        // not logged in
-        setUser(null)
-        setIsLoggedIn(false)
-        console.log("❌ User not authenticated (401)")
-        return
+  // Make verifyAuth a reusable function
+  const verifyAuth = useCallback(async () => {
+    try {
+      const res = await fetch("/api/proxy", {
+        method: "GET",
+        credentials: "include",
+      });
+      
+      if (res.status === 401) {
+        setUser(null);
+        setIsLoggedIn(false);
+        console.log("❌ User not authenticated (401)");
+        return false;
       }
-        if (res.ok) {
-          const data = await res.json();
-          if (data.loggedIn) {
-            setUser({ id: data.id, name: data.name });
-            setIsLoggedIn(true);
-            console.log("✅ User authenticated:", data.name);
-          } else {
-            setUser(null);
-            setIsLoggedIn(false);
-            console.log("❌ User not authenticated");
-          }
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.loggedIn) {
+          setUser({ id: data.id, name: data.name });
+          setIsLoggedIn(true);
+          console.log("✅ User authenticated:", data.name);
+          return true;
         } else {
           setUser(null);
           setIsLoggedIn(false);
-          console.log("❌ Auth check failed:", res.status);
+          console.log("❌ User not authenticated");
+          return false;
         }
-      } catch (error) {
-        console.error("❌ Auth verification error:", error);
+      } else {
         setUser(null);
         setIsLoggedIn(false);
-      } finally {
-        setIsAuthChecking(false);
+        console.log("❌ Auth check failed:", res.status);
+        return false;
       }
-    };
-
-    verifyAuth();
+    } catch (error) {
+      console.error("❌ Auth verification error:", error);
+      setUser(null);
+      setIsLoggedIn(false);
+      return false;
+    } finally {
+      setIsAuthChecking(false);
+    }
   }, []);
+
+  useEffect(() => {
+    verifyAuth();
+  }, [verifyAuth]);
 
   const login = (userData) => {
     setUser(userData);
     setIsLoggedIn(true);
     console.log("✅ User logged in:", userData.name);
+    // Optionally verify with backend to ensure sync
+    // verifyAuth();
   };
 
   const logout = async () => {
@@ -102,6 +111,7 @@ export const AuthProvider = ({ children }) => {
         isAuthChecking,
         login,
         logout,
+        verifyAuth,
         currency,
         setCurrency,
         getCurrencySymbol,

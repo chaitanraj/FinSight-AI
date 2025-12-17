@@ -51,24 +51,24 @@ function LoginPage() {
 
     const handleGoogleLogin = async () => {
         try {
-            const res = await signIn("google", { redirect: false })
-
-            if (res?.error) {
+            const res = await signIn("google", {
+                redirect: false,
+                callbackUrl: "/"
+            })
+            if (res?.error)
+            {
                 toast.error("Google login failed")
                 return
             }
-            await new Promise(r => setTimeout(r, 1000))
-            const sessionRes = await fetch("/api/auth/session")
-            const session = await sessionRes.json()
-            console.log("SESSION FROM NEXTAUTH", session)
+            if (res?.ok) {
+                const { getSession } = await import("next-auth/react")
+                const session = await getSession()
 
-            if (!session?.user?.email) {
-                toast.error("Could not get Google user")
-                return
-            }
-
-            const backendRes = await fetch("/api/login/google",
-                {
+                if (!session?.user?.email) {
+                    toast.error("Could not get Google user")
+                    return
+                }
+                const backendRes = await fetch("/api/login/google", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     credentials: "include",
@@ -76,19 +76,17 @@ function LoginPage() {
                         email: session.user.email,
                         name: session.user.name,
                     }),
+                })
+                const data = await backendRes.json()
+                if (!backendRes.ok) {
+                    toast.error(data?.message || "Backend Google login failed")
+                    return
                 }
-            )
 
-            const data = await backendRes.json()
-            console.log("Backend Response",data);
-
-            if (!backendRes.ok) {
-                toast.error(data?.message || "Backend Google login failed")
-                return
+                login(data.user)
+                toast.success(`Welcome ${data.user.name}`)
+                router.push("/")
             }
-            login(data.user)
-            toast.success(`Welcome ${data.user.name}`)
-            router.push("/")
         } catch (err) {
             console.error(err)
             toast.error("Google login error")
@@ -98,8 +96,7 @@ function LoginPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 py-12">
             <div className="w-full max-w-6xl">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">  
                     {/* Left Side - Form */}
                     <motion.div
                         className="w-full max-w-md mx-auto lg:mx-0"
