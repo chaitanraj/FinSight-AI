@@ -1,5 +1,6 @@
 "use client";
 import { Github, Apple } from 'lucide-react';
+import { signIn } from "next-auth/react"
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import { motion } from 'framer-motion';
@@ -13,7 +14,7 @@ function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
-    const{login}=useContext(AuthContext);
+    const { login } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,7 +22,6 @@ function LoginPage() {
             toast.warn("Please fill in all fields");
             return;
         }
-
         // setLoading(true);
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
@@ -35,10 +35,9 @@ function LoginPage() {
 
             if (res.ok) {
                 console.log("Login successful:", data);
-                console.log("Name: ",data.user.name)
+                console.log("Name: ", data.user.name)
                 login(data.user);
-                // toast.success(`Welcome ${data.user.name}`);
-                  toast.success(`Welcome ${data.user.name}`);
+                toast.success(`Welcome ${data.user.name}`);
 
                 router.push("/");
             } else {
@@ -49,6 +48,52 @@ function LoginPage() {
             toast.error("Server error");
         }
     };
+
+    const handleGoogleLogin = async () => {
+        try {
+            const res = await signIn("google", { redirect: false })
+
+            if (res?.error) {
+                toast.error("Google login failed")
+                return
+            }
+            await new Promise(r => setTimeout(r, 1000))
+            const sessionRes = await fetch("/api/auth/session")
+            const session = await sessionRes.json()
+            console.log("SESSION FROM NEXTAUTH", session)
+
+            if (!session?.user?.email) {
+                toast.error("Could not get Google user")
+                return
+            }
+
+            const backendRes = await fetch("/api/login/google",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        email: session.user.email,
+                        name: session.user.name,
+                    }),
+                }
+            )
+
+            const data = await backendRes.json()
+            console.log("Backend Response",data);
+
+            if (!backendRes.ok) {
+                toast.error(data?.message || "Backend Google login failed")
+                return
+            }
+            login(data.user)
+            toast.success(`Welcome ${data.user.name}`)
+            router.push("/")
+        } catch (err) {
+            console.error(err)
+            toast.error("Google login error")
+        }
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 py-12">
@@ -73,17 +118,17 @@ function LoginPage() {
                                 </p>
                             </div>
 
-                            {/* Social Login Buttons */}
+                            {/* Social Login */}
                             <div className="space-y-3 mb-6">
 
-                                <button className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200">
+                                <button onClick={handleGoogleLogin} className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors cursor-pointer duration-200">
                                     <FcGoogle className="w-5 h-5" />
                                     Continue with Google
                                 </button>
-                                <button className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200">
+                                {/* <button className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200">
                                     <FaApple className="w-5 h-5" />
                                     Continue with Apple
-                                </button>
+                                </button> */}
                             </div>
 
                             {/* Divider */}

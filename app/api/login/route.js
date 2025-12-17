@@ -41,7 +41,7 @@ export async function POST(req) {
       secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60,
     });
-    console.log("🍪 Setting cookie:", {
+    console.log(" Setting cookie:", {
       name: "token",
       value: token.substring(0, 20) + "...",
       httpOnly: true,

@@ -5,6 +5,7 @@ import Footer from "../components/Footer/page"
 import { ToastContainer } from "react-toastify";
 import { AuthProvider } from "@/context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
+import NextAuthSessionProvider from "./SessionProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,6 +31,7 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <NextAuthSessionProvider>
         <AuthProvider>
         <Navbar />
         {children}
@@ -47,6 +49,7 @@ export default function RootLayout({ children }) {
         />
         <Footer />
         </AuthProvider>
+        </NextAuthSessionProvider>
       </body>
     </html>
   );

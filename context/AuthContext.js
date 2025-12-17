@@ -15,14 +15,11 @@ export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [currency, setCurrencyState] = useState("INR");
-
-  // Load currency preference
   useEffect(() => {
     const saved = localStorage.getItem("preferredCurrency");
     if (saved) setCurrencyState(saved);
   }, []);
 
-  // Check authentication on mount
   useEffect(() => {
     const verifyAuth = async () => {
       try {
@@ -30,7 +27,13 @@ export const AuthProvider = ({ children }) => {
           method: "GET",
           credentials: "include",
         });
-
+        if (res.status === 401) {
+        // not logged in
+        setUser(null)
+        setIsLoggedIn(false)
+        console.log("❌ User not authenticated (401)")
+        return
+      }
         if (res.ok) {
           const data = await res.json();
           if (data.loggedIn) {
