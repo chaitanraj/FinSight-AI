@@ -1,77 +1,163 @@
-// prisma/seed.js
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const ALLOWED_CATEGORIES = [
-  "Groceries",
-  "Food",
-  "Transport",
-  "Shopping",
-  "Utilities",
-  "Rent",
-  "Entertainment",
-  "Health",
-  "Travel",
-  "Other"
-];
-
-// Helper: random integer
-function rand(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-// Helper: random category
-function randomCategory() {
-  const idx = rand(0, ALLOWED_CATEGORIES.length - 1);
-  return ALLOWED_CATEGORIES[idx];
-}
-
-// Helper: random recent date (last 60 days)
-function randomDate() {
-  const daysAgo = rand(0, 60);
-  const d = new Date();
-  d.setDate(d.getDate() - daysAgo);
-  return d;
-}
+const d = (date) => new Date(date);
 
 async function main() {
-  const expenses = [];
+  console.log("🌱 Seeding expenses with 70/30 distribution...");
 
-  // 20 expenses for userId = 1
-  for (let i = 0; i < 20; i++) {
-    expenses.push({
+  const expenses = [
+    // ======================================================
+    // USER 1 (≈30% DATA — lighter activity)
+    // ======================================================
+
+    // Rent (9 months)
+    ...[
+      "2025-07-01","2025-08-01","2025-09-01",
+      "2025-10-01","2025-11-01","2025-12-01",
+      "2026-01-01","2026-02-01","2026-03-01",
+    ].map(date => ({
       userId: 1,
-      merchant: `Merchant_${i + 1}`,
-      amount: rand(1, 2000),
-      category: randomCategory(),
-      date: randomDate(),
-      metadata: { note: "Sample seed expense" }
-    });
-  }
+      category: "Rent",
+      merchant: "Landlord",
+      amount: 10000,
+      date: d(date),
+    })),
 
-  // 30 expenses for userId = 2
-  for (let i = 0; i < 30; i++) {
-    expenses.push({
+    // Utilities (9 months)
+    ...[
+      ["2025-07-10",1500],["2025-08-10",1600],["2025-09-10",1550],
+      ["2025-10-10",1650],["2025-11-10",1700],["2025-12-10",1750],
+      ["2026-01-10",1680],["2026-02-10",1720],["2026-03-10",1700],
+    ].map(([date, amount]) => ({
+      userId: 1,
+      category: "Utilities",
+      merchant: "Utilities",
+      amount,
+      date: d(date),
+    })),
+
+    // Food (2 entries per month → lighter usage)
+    ...[
+      ["2025-07-05",800],["2025-07-20",900],
+      ["2025-08-06",850],["2025-08-22",950],
+      ["2025-09-07",900],["2025-09-24",1000],
+      ["2025-10-08",950],["2025-10-25",1050],
+      ["2025-11-09",1000],["2025-11-26",1100],
+      ["2025-12-10",1050],["2025-12-27",1150],
+      ["2026-01-11",1000],["2026-01-28",1100],
+      ["2026-02-12",1050],["2026-02-26",1150],
+      ["2026-03-13",1100],["2026-03-27",1200],
+    ].map(([date, amount]) => ({
+      userId: 1,
+      category: "Food",
+      merchant: "Restaurant",
+      amount,
+      date: d(date),
+    })),
+
+    // Groceries (monthly)
+    ...[
+      ["2025-07-08",1800],["2025-08-08",1850],["2025-09-08",1900],
+      ["2025-10-08",1950],["2025-11-08",2000],["2025-12-08",2100],
+      ["2026-01-08",2050],["2026-02-08",2150],["2026-03-08",2200],
+    ].map(([date, amount]) => ({
+      userId: 1,
+      category: "Groceries",
+      merchant: "Supermarket",
+      amount,
+      date: d(date),
+    })),
+
+    // ======================================================
+    // USER 2 (≈70% DATA — heavy & frequent activity)
+    // ======================================================
+
+    // Rent (9 months)
+    ...[
+      "2025-07-01","2025-08-01","2025-09-01",
+      "2025-10-01","2025-11-01","2025-12-01",
+      "2026-01-01","2026-02-01","2026-03-01",
+    ].map(date => ({
       userId: 2,
-      merchant: `Merchant_${i + 21}`,
-      amount: rand(1, 2000),
-      category: randomCategory(),
-      date: randomDate(),
-      metadata: { note: "Sample seed expense" }
-    });
-  }
+      category: "Rent",
+      merchant: "Landlord",
+      amount: 15000,
+      date: d(date),
+    })),
 
-  await prisma.expense.createMany({
-    data: expenses
-  });
+    // Utilities (9 months)
+    ...[
+      ["2025-07-10",2300],["2025-08-10",2400],["2025-09-10",2350],
+      ["2025-10-10",2450],["2025-11-10",2550],["2025-12-10",2650],
+      ["2026-01-10",2580],["2026-02-10",2680],["2026-03-10",2750],
+    ].map(([date, amount]) => ({
+      userId: 2,
+      category: "Utilities",
+      merchant: "Utilities",
+      amount,
+      date: d(date),
+    })),
 
-  console.log("Seed completed: 50 expenses inserted.");
+    // Food (4 entries per month → heavy usage)
+    ...[
+      ["2025-07-03",1200],["2025-07-10",1400],["2025-07-18",1300],["2025-07-26",1500],
+      ["2025-08-04",1250],["2025-08-11",1450],["2025-08-19",1350],["2025-08-28",1550],
+      ["2025-09-05",1300],["2025-09-12",1500],["2025-09-20",1400],["2025-09-29",1600],
+      ["2025-10-06",1350],["2025-10-13",1550],["2025-10-21",1450],["2025-10-30",1650],
+      ["2025-11-07",1400],["2025-11-14",1600],["2025-11-22",1500],["2025-11-30",1700],
+      ["2025-12-08",1500],["2025-12-15",1700],["2025-12-23",1600],["2025-12-31",1800],
+      ["2026-01-09",1550],["2026-01-16",1750],["2026-01-24",1650],["2026-01-31",1850],
+      ["2026-02-10",1600],["2026-02-17",1800],["2026-02-24",1700],["2026-02-28",1900],
+      ["2026-03-11",1650],["2026-03-18",1850],["2026-03-25",1750],["2026-03-31",1950],
+    ].map(([date, amount]) => ({
+      userId: 2,
+      category: "Food",
+      merchant: "Cafe",
+      amount,
+      date: d(date),
+    })),
+
+    // Shopping (more frequent)
+    ...[
+      ["2025-08-15",4200],
+      ["2025-09-18",3800],
+      ["2025-10-20",4500],
+      ["2025-11-22",4800],
+      ["2025-12-24",5200],
+      ["2026-02-14",5000],
+    ].map(([date, amount]) => ({
+      userId: 2,
+      category: "Shopping",
+      merchant: "Online Store",
+      amount,
+      date: d(date),
+    })),
+
+    // Travel (multiple)
+    ...[
+      ["2025-08-20",6000],
+      ["2025-12-22",8500],
+      ["2026-03-15",7200],
+    ].map(([date, amount]) => ({
+      userId: 2,
+      category: "Travel",
+      merchant: "Travel Agency",
+      amount,
+      date: d(date),
+    })),
+  ];
+
+  await prisma.expense.createMany({ data: expenses });
+
+  console.log("✅ Seed completed (User2 ≈70%, User1 ≈30%)");
 }
 
 main()
-  .then(() => prisma.$disconnect())
-  .catch(async (err) => {
-    console.error(err);
-    await prisma.$disconnect();
+  .catch(e => {
+    console.error(e);
     process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });

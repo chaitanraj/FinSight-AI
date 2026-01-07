@@ -13,7 +13,7 @@ CORS(app)
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({"message": "Prophet API is running"}), 200
+    return jsonify({"message": "ML Service is running"}), 200
 
 
 @app.route("/forecast/global", methods=["POST"])
