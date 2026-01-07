@@ -22,6 +22,9 @@ import {
   HelpCircle
 } from 'lucide-react';
 import AddExpenseModal from '@/components/AddExpenseModal/page';
+import ExpenseCalendar from '@/components/GoToCalendar/GoToCalendar';
+import { useRef } from 'react';
+
 
 const categoryConfig = {
   Groceries: {
@@ -78,7 +81,7 @@ const categoryConfig = {
 
 const PieChart = ({ data, total }) => {
   const [hoveredSegment, setHoveredSegment] = useState(null);
-  
+
   if (!data || data.length === 0) {
     return (
       <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto flex items-center justify-center">
@@ -88,7 +91,7 @@ const PieChart = ({ data, total }) => {
       </div>
     );
   }
-  
+
   let currentAngle = -90;
   const segments = data.map((item, index) => {
     const percentage = (item.amount / total) * 100;
@@ -103,14 +106,14 @@ const PieChart = ({ data, total }) => {
       index
     };
   });
-  
+
   const createArcPath = (startAngle, angle) => {
     const start = polarToCartesian(128, 128, 80, startAngle);
     const end = polarToCartesian(128, 128, 80, startAngle + angle);
     const largeArcFlag = angle > 180 ? 1 : 0;
     return `M 128 128 L ${start.x} ${start.y} A 80 80 0 ${largeArcFlag} 1 ${end.x} ${end.y} Z`;
   };
-  
+
   const polarToCartesian = (centerX, centerY, radius, angleInDegrees) => {
     const angleInRadians = (angleInDegrees * Math.PI) / 180.0;
     return {
@@ -118,7 +121,7 @@ const PieChart = ({ data, total }) => {
       y: centerY + radius * Math.sin(angleInRadians)
     };
   };
-  
+
   return (
     <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto flex-shrink-0">
       <svg width="100%" height="100%" viewBox="0 0 256 256" className="mx-auto">
@@ -160,17 +163,17 @@ const PieChart = ({ data, total }) => {
 
 const ExpenseTypeCard = ({ icon: Icon, label, amount, color }) => (
   <motion.div
-    whileHover={{ scale: 1.02, y: -2 }}
+    whileHover={{ scale: 1.05, y: -2 }}
     className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-4 hover:border-emerald-500/30 transition-all cursor-pointer"
   >
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
-        <div className={`w-10 h-10 rounded-lg ${color} bg-opacity-10 flex items-center justify-center`}>
+        <div className={`w-7 h-9 rounded-lg ${color} bg-opacity-10 flex items-center justify-center`}>
           <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
         </div>
         <div>
           <p className="text-sm text-gray-400">{label}</p>
-          <p className="text-lg font-semibold text-white">${amount.toLocaleString()}</p>
+          <p className="text-lg font-semibold text-white">₹{amount.toLocaleString()}</p>
         </div>
       </div>
       <ArrowUpRight className="w-4 h-4 text-gray-600" />
@@ -195,7 +198,7 @@ const RecentExpenseRow = ({ date, merchant, amount, category, categoryColor }) =
       <span className="text-white font-medium">{merchant}</span>
     </div>
     <div className="flex items-center">
-      <span className="text-white font-semibold">${amount.toFixed(2)}</span>
+      <span className="text-white font-semibold">₹{amount.toFixed(2)}</span>
     </div>
     <div className="flex items-center">
       <span className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColor}`}>
@@ -206,6 +209,52 @@ const RecentExpenseRow = ({ date, merchant, amount, category, categoryColor }) =
 );
 
 export default function Dashboard({ user, expenses = [] }) {
+  
+  const expenseRefs = useRef({});
+  const [selectedDate, setSelectedDate] = useState('');
+
+ 
+  const uniqueDates = useMemo(() => {
+    const dates = expenses.map(exp =>
+      new Date(exp.date).toISOString().split("T")[0]
+    );
+
+    return [...new Set(dates)].sort(
+      (a, b) => new Date(b) - new Date(a)
+    );
+  }, [expenses]);
+  const availableDates = useMemo(() => {
+  return new Set(
+    expenses.map(exp =>
+      new Date(exp.date).toISOString().split("T")[0]
+    )
+  );
+}, [expenses]);
+
+
+
+  // Scroll function
+ const scrollToDate = (dateString) => {
+  const firstExpense = expenses.find(exp =>
+    new Date(exp.date).toISOString().split('T')[0] === dateString
+  );
+
+  if (firstExpense) {
+    expenseRefs.current[firstExpense.id]?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest'
+    });
+  }
+};
+
+
+  // Handle date change
+  const handleDateChange = (e) => {
+    const date = e.target.value;
+    setSelectedDate(date);
+    scrollToDate(date);
+  };
+
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const router = useRouter();
 
@@ -242,7 +291,7 @@ export default function Dashboard({ user, expenses = [] }) {
     return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   };
 
-  
+
   const handleExpenseAdded = () => {
     setIsAddExpenseOpen(false);
     router.refresh();
@@ -261,7 +310,7 @@ export default function Dashboard({ user, expenses = [] }) {
     },
     {
       type: 'info',
-      message: "Consider setting aside $200 more this month to reach your savings goal",
+      message: "Consider setting aside ₹200 more this month to reach your savings goal",
       icon: Sparkles
     }
   ];
@@ -308,23 +357,21 @@ export default function Dashboard({ user, expenses = [] }) {
                 <DollarSign className="w-6 h-6 text-white/80" />
               </div>
               <p className="text-5xl font-bold text-white mb-4">
-                ${stats.totalSpending.toLocaleString(undefined, { 
-                  minimumFractionDigits: 2, 
-                  maximumFractionDigits: 2 
+                ₹{stats.totalSpending.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
                 })}
               </p>
               <div className="flex items-center gap-2">
-                <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${
-                  stats.monthlyChange >= 0 ? 'bg-red-500/20' : 'bg-green-500/20'
-                }`}>
+                <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${stats.monthlyChange >= 0 ? 'bg-red-500/20' : 'bg-green-500/20'
+                  }`}>
                   {stats.monthlyChange >= 0 ? (
                     <TrendingUp className="w-4 h-4 text-red-200" />
                   ) : (
                     <TrendingDown className="w-4 h-4 text-green-200" />
                   )}
-                  <span className={`text-sm font-semibold ${
-                    stats.monthlyChange >= 0 ? 'text-red-200' : 'text-green-200'
-                  }`}>
+                  <span className={`text-sm font-semibold ${stats.monthlyChange >= 0 ? 'text-red-200' : 'text-green-200'
+                    }`}>
                     {Math.abs(stats.monthlyChange)}%
                   </span>
                 </div>
@@ -344,11 +391,10 @@ export default function Dashboard({ user, expenses = [] }) {
               <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-around gap-8">
                 <PieChart data={stats.categoryBreakdown} total={stats.totalSpending} />
 
-                <div className={`${
-                  stats.categoryBreakdown.length > 5
-                    ? 'grid grid-cols-2 gap-x-8 gap-y-3'
-                    : 'space-y-3'
-                }`}>
+                <div className={`${stats.categoryBreakdown.length > 5
+                  ? 'grid grid-cols-2 gap-x-8 gap-y-3'
+                  : 'space-y-3'
+                  }`}>
                   {stats.categoryBreakdown.map((item, index) => (
                     <motion.div
                       key={item.category}
@@ -362,9 +408,9 @@ export default function Dashboard({ user, expenses = [] }) {
                         style={{ backgroundColor: item.color }}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white">{item.category}</p>
-                        <p className="text-xs text-gray-400">
-                          ${item.amount.toFixed(2)} ({((item.amount / stats.totalSpending) * 100).toFixed(1)}%)
+                        <p className="text-md font-medium text-white">{item.category}</p>
+                        <p className="text-sm text-gray-400">
+                          ₹{item.amount.toFixed(2)} ({((item.amount / stats.totalSpending) * 100).toFixed(1)}%)
                         </p>
                       </div>
                     </motion.div>
@@ -394,21 +440,19 @@ export default function Dashboard({ user, expenses = [] }) {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.4 + index * 0.1 }}
                   whileHover={{ scale: 1.02 }}
-                  className={`p-4 rounded-xl border ${
-                    insight.type === 'warning'
-                      ? 'bg-red-500/20 border-red-500/30'
-                      : insight.type === 'success'
-                        ? 'bg-emerald-500/10 border-emerald-500/30'
-                        : 'bg-blue-500/10 border-blue-500/30'
-                  }`}
+                  className={`p-4 rounded-xl border ${insight.type === 'warning'
+                    ? 'bg-red-500/20 border-red-500/30'
+                    : insight.type === 'success'
+                      ? 'bg-emerald-500/10 border-emerald-500/30'
+                      : 'bg-blue-500/10 border-blue-500/30'
+                    }`}
                 >
-                  <insight.icon className={`w-5 h-5 mb-3 ${
-                    insight.type === 'warning'
-                      ? 'text-yellow-400'
-                      : insight.type === 'success'
-                        ? 'text-emerald-400'
-                        : 'text-blue-400'
-                  }`} />
+                  <insight.icon className={`w-5 h-5 mb-3 ${insight.type === 'warning'
+                    ? 'text-yellow-400'
+                    : insight.type === 'success'
+                      ? 'text-emerald-400'
+                      : 'text-blue-400'
+                    }`} />
                   <p className="text-sm text-gray-300 leading-relaxed">{insight.message}</p>
                 </motion.div>
               ))}
@@ -451,14 +495,26 @@ export default function Dashboard({ user, expenses = [] }) {
           transition={{ delay: 0.5 }}
         >
           <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-6">
-            <h3 className="text-xl font-semibold text-white mb-6">Recent Expenses</h3>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-white">All Expenses</h3>
+
+             {expenses.length > 0 && (
+  <ExpenseCalendar
+    availableDates={availableDates}
+    onSelect={scrollToDate}
+  />
+)}
+
+            </div>
+
             {expenses.length === 0 ? (
               <p className="text-center text-gray-400 py-8">No expenses yet. Add your first expense!</p>
             ) : (
-              <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-gray-600">
+              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-gray-600">
                 {expenses.map((expense, index) => (
                   <motion.div
                     key={expense.id}
+                    ref={(el) => expenseRefs.current[expense.id] = el}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.6 + index * 0.05 }}
@@ -479,6 +535,7 @@ export default function Dashboard({ user, expenses = [] }) {
             )}
           </div>
         </motion.div>
+
       </main>
 
       <AnimatePresence>
