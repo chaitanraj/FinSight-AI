@@ -4,6 +4,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon } from 'lucide-react';
+import { timeZoneHelper } from '@/utils/timeZoneHelper';
 
 export default function ExpenseCalendar({ availableDates, onSelect }) {
   return (
@@ -24,18 +25,19 @@ export default function ExpenseCalendar({ availableDates, onSelect }) {
           onSelect={(date) => {
             if (!date) return;
 
-            const normalized = date.toISOString().split('T')[0];
+            const normalized = timeZoneHelper(date);
+            //  const normalized = getLocalDateString(date);
             if (availableDates.has(normalized)) {
               onSelect(normalized);
             }
           }}
           disabled={(date) => {
-            const normalized = date.toISOString().split('T')[0];
+            const normalized = timeZoneHelper(date);
             return !availableDates.has(normalized);
           }}
           modifiers={{
             hasExpense: (date) =>
-              availableDates.has(date.toISOString().split('T')[0])
+              availableDates.has(timeZoneHelper(date))
           }}
           modifiersClassNames={{
             hasExpense:

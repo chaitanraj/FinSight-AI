@@ -146,6 +146,59 @@ async function main() {
       amount,
       date: d(date),
     })),
+    ...[
+      ["2025-08-20",600],
+      ["2025-12-22",8500],
+      ["2026-04-17",200],
+      ["2026-04-21",100],
+      ["2026-03-22",90],
+    ].map(([date, amount]) => ({
+      userId: 2,
+      category: "Other",
+      merchant: "Agency",
+      amount,
+      date: d(date),
+    })),
+    ...[
+      ["2025-08-20",6000],
+      ["2025-12-22",8500],
+      ["2026-03-15",200],
+      ["2026-08-15",200],
+      ["2025-01-15",100],
+      ["2025-11-15",150],
+    ].map(([date, amount]) => ({
+      userId: 2,
+      category: "Transport",
+      merchant: "Transport Agency",
+      amount,
+      date: d(date),
+    })),
+    ...[
+      ["2025-08-20",60],
+      ["2025-12-22",340],
+      ["2026-02-11",70],
+      ["2026-03-12",200],
+      ["2026-02-15",80],
+    ].map(([date, amount]) => ({
+      userId: 2,
+      category: "Entertainment",
+      merchant: "Entertainment Agency",
+      amount,
+      date: d(date),
+    })),
+    ...[
+      ["2025-08-20",1900],
+      ["2025-12-22",500],
+      ["2026-02-11",70],
+      ["2026-01-13",200],
+      ["2026-03-12",100],
+    ].map(([date, amount]) => ({
+      userId: 2,
+      category: "Health",
+      merchant: "Hospital Agency",
+      amount,
+      date: d(date),
+    })),
   ];
 
   await prisma.expense.createMany({ data: expenses });

@@ -24,6 +24,7 @@ import {
 import AddExpenseModal from '@/components/AddExpenseModal/page';
 import ExpenseCalendar from '@/components/GoToCalendar/GoToCalendar';
 import { useRef } from 'react';
+import { timeZoneHelper } from '@/utils/timeZoneHelper';
 
 
 const categoryConfig = {
@@ -209,44 +210,36 @@ const RecentExpenseRow = ({ date, merchant, amount, category, categoryColor }) =
 );
 
 export default function Dashboard({ user, expenses = [] }) {
-  
+
   const expenseRefs = useRef({});
   const [selectedDate, setSelectedDate] = useState('');
-
- 
   const uniqueDates = useMemo(() => {
-    const dates = expenses.map(exp =>
-      new Date(exp.date).toISOString().split("T")[0]
-    );
+    const dates = expenses.map(exp => timeZoneHelper(exp.date));
 
     return [...new Set(dates)].sort(
       (a, b) => new Date(b) - new Date(a)
     );
   }, [expenses]);
+
   const availableDates = useMemo(() => {
-  return new Set(
-    expenses.map(exp =>
-      new Date(exp.date).toISOString().split("T")[0]
-    )
-  );
-}, [expenses]);
-
-
+    return new Set(
+      expenses.map(exp => timeZoneHelper(exp.date))
+    );
+  }, [expenses]);
 
   // Scroll function
- const scrollToDate = (dateString) => {
-  const firstExpense = expenses.find(exp =>
-    new Date(exp.date).toISOString().split('T')[0] === dateString
-  );
+  const scrollToDate = (dateString) => {
+    const firstExpense = expenses.find(exp =>
+      timeZoneHelper(exp.date) === dateString
+    );
 
-  if (firstExpense) {
-    expenseRefs.current[firstExpense.id]?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest'
-    });
-  }
-};
-
+    if (firstExpense) {
+      expenseRefs.current[firstExpense.id]?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest'
+      });
+    }
+  };
 
   // Handle date change
   const handleDateChange = (e) => {
@@ -254,6 +247,7 @@ export default function Dashboard({ user, expenses = [] }) {
     setSelectedDate(date);
     scrollToDate(date);
   };
+
 
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const router = useRouter();
@@ -498,12 +492,12 @@ export default function Dashboard({ user, expenses = [] }) {
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-semibold text-white">All Expenses</h3>
 
-             {expenses.length > 0 && (
-  <ExpenseCalendar
-    availableDates={availableDates}
-    onSelect={scrollToDate}
-  />
-)}
+              {expenses.length > 0 && (
+                <ExpenseCalendar
+                  availableDates={availableDates}
+                  onSelect={scrollToDate}
+                />
+              )}
 
             </div>
 
