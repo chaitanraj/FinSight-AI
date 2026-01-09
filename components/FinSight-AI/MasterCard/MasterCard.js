@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import { TrendingDown, TrendingUp, Sparkles, Type, AlertTriangle, Info, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '@/context/AuthContext';
@@ -32,9 +32,11 @@ const MasterCard = () => {
 
   const [aiInsights, setAiInsights] = useState([]);
 
-  const addInsight = (insight) => {
-    setAiInsights(prev => [...prev, insight]);
-  };
+   const addInsight = useCallback((insight) => {
+        setAiInsights([insight]);
+    }, []);
+
+
   const { user } = useContext(AuthContext);
 
   return (
@@ -181,6 +183,7 @@ const MasterCard = () => {
                 </motion.div>
               </motion.div>
             ) : (
+              
               <motion.div
                 key="insights"
                 initial={{ opacity: 0 }}
@@ -188,6 +191,7 @@ const MasterCard = () => {
                 exit={{ opacity: 0 }}
                 className="grid grid-cols-1 md:grid-cols-3 gap-4"
               >{aiInsights.map((insight, index) => {
+                console.log('aiInsights:', aiInsights);
                 const ui = INSIGHT_UI[insight.type];
                 const Icon = ui.icon;
                 return (
@@ -237,15 +241,15 @@ const MasterCard = () => {
                     >
                       <Icon className={`w-5 h-5 mb-3 ${ui.iconColor}`} />
                     </motion.div>
-                    {/* ***************2ND IDEA********************* */}
+                    
                     <div className="relative z-10 space-y-3">
                       <p className="text-sm text-gray-300 leading-relaxed">
                         {insight.message}
                       </p>
                       <div className="flex items-center gap-2 pt-2 border-t border-gray-700/50">
                         <div className="flex items-baseline gap-1">
-                          <span className="text-2xl font-bold text-yellow-400">
-                            {insight.meta.anomalyDays}
+                          <span className="text-3xl font-bold text-yellow-400">
+                            {insight.meta.anomalyDays} 
                           </span>
                           <span className="text-xs text-gray-300">
                             unusual days detected
@@ -259,7 +263,7 @@ const MasterCard = () => {
                       <span>More info</span>
                       <ChevronRight className="w-3 h-3" />
                     </button>
-                  {/* ************************************************ */}
+  
                   </motion.div>
                 );
               })}

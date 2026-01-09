@@ -27,7 +27,7 @@ const InsightModal = ({ insight, onClose }) => {
       >
         <motion.div
           onClick={(e) => e.stopPropagation()}
-          className="bg-gradient-to-br from-gray-900 via-gray-900 to-emerald-950/30 rounded-2xl w-full max-w-3xl max-h-[75vh] relative border border-emerald-500/20 shadow-2xl shadow-emerald-500/10 flex flex-col overflow-hidden"
+          className="bg-gradient-to-br from-gray-900 via-gray-900 to-emerald-950/30 rounded-2xl w-full max-w-2xl max-h-[80vh] relative border border-emerald-500/20 shadow-2xl shadow-emerald-500/10 flex flex-col overflow-hidden"
           initial={{ scale: 0.8, y: 50, opacity: 0 }}
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.8, y: 50, opacity: 0 }}

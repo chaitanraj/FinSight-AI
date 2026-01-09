@@ -32,10 +32,6 @@ const AnomalyCard = ({ onInsight }) => {
                 const { anomalies, anomaly_days, average_expense } = data;
 
                 if (average_expense < 500) return;
-
-                // const meaningful = anomalies.filter(day =>
-                //     Math.abs(day.amount - average_expense) >= 0.25 * average_expense
-                // );
                 const meaningful=anomalies;
 
                 if (meaningful.length === 0) {
@@ -76,15 +72,6 @@ const AnomalyCard = ({ onInsight }) => {
 
     return (
         null
-        // <div>
-        //     {/* <button onClick={AnomalyInsights} className="border p-2 rounded cursor-pointer">Anomaly insights</button> */}
-        //     {message && (
-        //         <div className="mt-4 flex items-center gap-2">
-        //             <message.icon size={16} />
-        //             <span>{message.message}</span>
-        //         </div>
-        //     )}
-        // </div>
     )
 }
 
