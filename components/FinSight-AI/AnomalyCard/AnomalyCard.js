@@ -48,7 +48,7 @@ const AnomalyCard = ({ onInsight }) => {
                     meaningful.length > 3
                         ? `Your spending has been more variable on several days recently.`
                         : `We noticed ${meaningful.length} day${meaningful.length > 1 ? "s" : ""
-                        } with unusually high spending`;
+                        } with unusually high spending.`;
 
                 onInsight({
                     type: "warning",
@@ -68,7 +68,7 @@ const AnomalyCard = ({ onInsight }) => {
 
         AnomalyInsights();
 
-    }, [user]);
+    }, [user?.id]);
 
     return (
         null

@@ -1,55 +1,87 @@
 import React, { useCallback, useContext, useState } from 'react'
-import { TrendingDown, TrendingUp, Sparkles, Type, AlertTriangle, Info, ChevronRight } from 'lucide-react';
+import { TrendingDown, TrendingUp, Sparkles, Type, AlertTriangle, Info, ChevronRight, Brain, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '@/context/AuthContext';
 import AnomalyCard from '../AnomalyCard/AnomalyCard';
 import InsightModal from '@/modals/InsightModals/InsightModal';
+import GlobalProphetCard from '../GlobalProphetCard/GlobalProphetCard';
+import GlobalProphetModal from '@/modals/GlobalProphetModal/GlobalProphetModal';
+
 
 const MasterCard = () => {
-
   const [selectedInsight, setSelectedInsight] = useState(null);
 
   const INSIGHT_UI = {
     warning: {
-      icon: AlertTriangle,
+      icon: Activity,
       bg: "bg-amber-500/10 border-amber-500/30",
       iconColor: "text-amber-400",
-      sweep: "via-amber-400/10"
+      sweep: "via-amber-400/10",
     },
+
     success: {
       icon: TrendingDown,
       bg: "bg-emerald-500/10 border-emerald-500/30",
       iconColor: "text-emerald-400",
-      sweep: "via-emerald-400/10"
+      sweep: "via-emerald-400/10",
     },
+
     info: {
-      icon: Info,
-      bg: "bg-blue-500/10 border-blue-500/30",
-      iconColor: "text-blue-400",
-      sweep: "via-blue-400/10"
-    }
+      icon: Activity,
+      bg: "bg-cyan-500/10 border-cyan-500/30",
+      iconColor: "text-cyan-400",
+      sweep: "via-cyan-400/10",
+    },
+
+    prediction: {
+      icon: TrendingUp,
+      bg: "bg-red-500/10 border-red-500/30",
+      iconColor: "text-red-400",
+      sweep: "via-red-400/10",
+    },
+
+    drop: {
+      icon: TrendingDown,
+      bg: "bg-green-500/10 border-green-500/30",
+      iconColor: "text-green-400",
+      sweep: "via-green-400/10",
+    },
+    trend: {
+      icon: Activity,
+      bg: "bg-purple-500/10 border-purple-500/30",
+      iconColor: "text-purple-400",
+      sweep: "via-purple-400/10",
+    },
+    learning: {
+      icon: Brain,
+      bg: "bg-gray-500/10 border-gray-500/30",
+      iconColor: "text-gray-400",
+      sweep: "via-gray-400/10",
+    },
   };
+
 
   const [aiInsights, setAiInsights] = useState([]);
 
   const addInsight = useCallback((insight) => {
-    setAiInsights([insight]);
+    setAiInsights(prev => {
+      const filtered = prev.filter(i => i.meta?.modelType !== insight.meta?.modelType);
+      return [...filtered, insight];
+    });
   }, []);
-
-
   const { user } = useContext(AuthContext);
 
   return (
-
     <div>
       <AnomalyCard onInsight={addInsight} />
+      <GlobalProphetCard onInsight={addInsight} />
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         className="mb-8"
       >
-
         <AnimatePresence mode="wait">
           {aiInsights.length === 0 ? (
             <motion.div
@@ -167,14 +199,13 @@ const MasterCard = () => {
               </motion.div>
             </motion.div>
           ) : (
-
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="mb-8"
             >
-                     <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-6">
+              <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-6">
                 <div className="flex items-center gap-3 mb-6">
                   <motion.div
                     animate={{
@@ -191,6 +222,7 @@ const MasterCard = () => {
                   </motion.div>
                   <h3 className="text-xl font-semibold text-white">FinSight-AI Insights</h3>
                 </div>
+
                 <motion.div
                   animate={{
                     boxShadow: [
@@ -213,93 +245,138 @@ const MasterCard = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   className="grid grid-cols-1 md:grid-cols-3 gap-4"
-                >{aiInsights.map((insight, index) => {
-                  console.log('aiInsights:', aiInsights);
-                  const ui = INSIGHT_UI[insight.type];
-                  const Icon = ui.icon;
-                  return (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      onClick={() => insight.meta && setSelectedInsight(insight)}
-                      transition={{
-                        delay: 0.1 * index,
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 15
-                      }}
-                      whileHover={{
-                        scale: 1.03,
-                        y: -4,
-                        transition: { duration: 0.2 }
-                      }}
-                      className={`p-4 rounded-xl border relative overflow-hidden cursor-pointer ${ui.bg}`}
-                    >
-                      <motion.div
-                        initial={{ x: '-100%' }}
-                        animate={{ x: '100%' }}
-                        transition={{
-                          duration: 2,
-                          delay: index * 0.3,
-                          repeat: 0,
-                        }}
-                        className={`absolute inset-0 ${insight.type === 'warning'
-                          ? 'bg-gradient-to-r from-transparent via-yellow-400/10 to-transparent'
-                          : insight.type === 'success'
-                            ? 'bg-gradient-to-r from-transparent via-emerald-400/10 to-transparent'
-                            : 'bg-gradient-to-r from-transparent via-blue-400/10 to-transparent'
-                          }`}
-                      />
+                >
+                  {aiInsights.map((insight, index) => {
+                    console.log('aiInsights:', aiInsights);
+                    const ui = INSIGHT_UI[insight.type];
+                    const Icon = ui.icon;
+                    const isPlaceholder = insight.meta?.isPlaceholder;
 
+                    return (
                       <motion.div
-                        animate={{
-                          rotate: [0, 5, -5, 0],
-                        }}
+                        key={index}
+                        onClick={() => !isPlaceholder && insight.meta && setSelectedInsight(insight)}
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
                         transition={{
-                          duration: 2,
-                          delay: index * 0.2,
-                          repeat: 0,
+                          delay: 0.1 * index,
+                          type: "spring",
+                          stiffness: 100,
+                          damping: 15
                         }}
+                        whileHover={{
+                          scale: 1.03,
+                          y: -4,
+                          transition: { duration: 0.2 }
+                        }}
+                        className={`p-4 rounded-xl border relative overflow-hidden ${isPlaceholder ? 'cursor-default' : 'cursor-pointer'
+                          } ${ui.bg}`}
                       >
-                        <Icon className={`w-5 h-5 mb-3 ${ui.iconColor}`} />
-                      </motion.div>
+                        <motion.div
+                          initial={{ x: '-100%' }}
+                          animate={{ x: '100%' }}
+                          transition={{
+                            duration: 2,
+                            delay: index * 0.3,
+                            repeat: 0,
+                          }}
+                          className={`absolute inset-0 ${insight.type === 'warning'
+                              ? 'bg-gradient-to-r from-transparent via-yellow-400/10 to-transparent'
+                              : insight.type === 'success'
+                                ? 'bg-gradient-to-r from-transparent via-emerald-400/10 to-transparent'
+                                : insight.type === 'prediction'
+                                  ? 'bg-gradient-to-r from-transparent via-orange-400/10 to-transparent'
 
-                      <div className="relative z-10 space-y-3">
-                        <p className="text-sm text-gray-300 leading-relaxed">
-                          {insight.message}
-                        </p>
-                        <div className="flex items-center gap-2 pt-2 border-t border-gray-700/50">
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-3xl font-bold text-yellow-400">
-                              {insight.meta.anomalyDays}
-                            </span>
-                            <span className="text-xs text-gray-300">
-                              unusual days detected
-                            </span>
+                                  : 'bg-gradient-to-r from-transparent via-blue-400/10 to-transparent'
+                            }`}
+                        />
+
+                        <motion.div
+                          animate={{
+                            rotate: [0, 5, -5, 0],
+                          }}
+                          transition={{
+                            duration: 2,
+                            delay: index * 0.2,
+                            repeat: 0,
+                          }}
+                        >
+                          <Icon className={`w-5 h-5 mb-3 ${ui.iconColor}`} />
+                        </motion.div>
+
+                        <div className="relative z-10 space-y-3">
+                          <div className="h-[8vh] mb-5">
+                            <p className="text-sm text-gray-100 leading-relaxed">
+                              {insight.message}
+                            </p>
                           </div>
-                        </div>
-                      </div>
-                      <button
-                        className="cursor-pointer absolute bottom-3 right-3 text-md text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors z-20"
-                      >
-                        <span>More info</span>
-                        <ChevronRight className="w-3 h-3" />
-                      </button>
 
-                    </motion.div>
-                  );
-                })}
+                          {isPlaceholder ? (
+                            <div className="flex items-center gap-2 pt-2 border-t border-gray-700/50">
+                              <motion.div
+                                animate={{ opacity: [0.3, 1, 0.3] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                className="flex items-center gap-1"
+                              >
+                                <span className="text-xs text-gray-400">
+                                  {insight.meta.modelType === 'prophet' ? 'Prophet AI' : 'Model'} is learning...
+                                </span>
+                              </motion.div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-2 pt-2 border-t border-gray-700/50">
+                                {insight.meta.modelType === 'prophet' ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-3xl font-bold text-orange-400">
+                                      {insight.meta.displayValue}
+                                    </span>
+                                    <span className="text-xs text-gray-300">
+                                      predicted
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-3xl font-bold text-yellow-400">
+                                      {insight.meta.anomalyDays}
+                                    </span>
+                                    <span className="text-xs text-gray-300">
+                                      unusual days detected
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+
+                              <button
+                                className="cursor-pointer absolute bottom-3 right-3 text-md text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors z-20"
+                              >
+                                <span>More info</span>
+                                <ChevronRight className="w-3 h-3" />
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </motion.div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </motion.div>
-      <InsightModal
-        insight={selectedInsight}
-        onClose={() => setSelectedInsight(null)}
-      />
+
+      {selectedInsight?.meta?.modelType === 'prophet' ? (
+        <GlobalProphetModal
+          insight={selectedInsight}
+          onClose={() => setSelectedInsight(null)}
+        />
+      ) : (
+        <InsightModal
+          insight={selectedInsight}
+          onClose={() => setSelectedInsight(null)}
+        />
+      )}
     </div>
   )
 }

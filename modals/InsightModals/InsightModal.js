@@ -4,6 +4,8 @@ import AnomalyDetails from "./AnomalyDetails";
 import { X } from "lucide-react";
 
 const InsightModal = ({ insight, onClose }) => {
+  // const isProphet = insight.meta?.modelType === 'prophet';
+  // const isAnomaly = insight.meta?.modelType === 'anomaly';
   useEffect(() => {
     if (insight) {
       document.body.style.overflow = 'hidden';
