@@ -1,7 +1,19 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, TrendingUp, TrendingDown, AlertTriangle, Calendar, Activity, Brain, Info } from "lucide-react";
+import { useEffect } from "react";
 
 const GlobalProphetModal = ({ insight, onClose }) => {
+
+  useEffect(() => {
+    if (insight) {
+      document.body.style.overflow = 'hidden';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [insight]);
+    
   if (!insight || insight.meta?.modelType !== 'prophet') return null;
 
   const { 
@@ -13,7 +25,6 @@ const GlobalProphetModal = ({ insight, onClose }) => {
     showWarning 
   } = insight.meta;
 
-  // Calculate values
   const difference = predictionValue - lastMonthActual;
   const isIncrease = difference > 0;
   const confidenceWidth = 
@@ -27,18 +38,20 @@ const GlobalProphetModal = ({ insight, onClose }) => {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" // Fixed z-index typo (z-57 -> z-50)
       >
         <motion.div
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
           onClick={(e) => e.stopPropagation()}
-          className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto modal-scroll"
+          // CHANGED: Added flex flex-col, REMOVED overflow/modal-scroll
+          className="bg-gradient-to-br from-gray-900 via-gray-900 to-emerald-950/30 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col"
         >
           
-          {/* Header */}
-          <div className="sticky top-0 bg-gray-900/95 backdrop-blur border-b border-gray-800 p-6 flex items-center justify-between z-10">
+          {/* Header - Fixed */}
+          {/* CHANGED: Added flex-none */}
+          <div className="flex-none sticky top-0 bg-gray-900/95 backdrop-blur border-b border-gray-800 p-6 flex items-center justify-between z-10 rounded-t-2xl">
             <div className="flex items-center gap-3">
               <motion.div
                 animate={{ 
@@ -55,16 +68,21 @@ const GlobalProphetModal = ({ insight, onClose }) => {
                 <p className="text-sm text-gray-400">AI-powered expense prediction</p>
               </div>
             </div>
-            <button
+            <motion.button
               onClick={onClose}
-              className="p-2 hover:bg-gray-800 rounded-lg transition-colors group"
+              className="p-2 rounded-full bg-gray-800/50 hover:bg-gray-700/70 text-gray-400 hover:text-emerald-400 transition-all duration-200 backdrop-blur-sm border border-gray-700/50 hover:border-emerald-500/30 cursor-pointer"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
             >
-              <X className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors" />
-            </button>
+              <X className="w-5 h-5" />
+            </motion.button>
           </div>
 
-          {/* Contfidence message*/}
-          <div className="p-6">
+          {/* Scrollable Content Container */}
+          {/* CHANGED: Added wrapper div with flex-1, overflow-y-auto, modal-scroll */}
+          <div className="flex-1 overflow-y-auto modal-scroll p-6">
+            
+            {/* Confidence message */}
             <motion.p 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -274,7 +292,8 @@ const GlobalProphetModal = ({ insight, onClose }) => {
           </div>
 
         </motion.div>
-        <style jsx>{`
+        
+        <style jsx global>{`
           .modal-scroll {
             /* Smooth scrolling behavior */
             scroll-behavior: smooth;
@@ -287,26 +306,35 @@ const GlobalProphetModal = ({ insight, onClose }) => {
           }
           
           .modal-scroll::-webkit-scrollbar-track {
-            background: rgba(17, 24, 39, 0.4);
+            background: rgba(30, 25, 25, 0.4); 
             border-radius: 10px;
           }
           
           .modal-scroll::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, rgba(16, 185, 129, 0.4), rgba(16, 185, 129, 0.6));
+            background: linear-gradient(
+              180deg, 
+              rgba(234, 88, 12, 0.4), 
+              rgba(234, 88, 12, 0.6)
+            );
             border-radius: 10px;
             border: 2px solid rgba(17, 24, 39, 0.4);
           }
           
           .modal-scroll::-webkit-scrollbar-thumb:hover {
-            background: linear-gradient(180deg, rgba(16, 185, 129, 0.6), rgba(16, 185, 129, 0.8));
+            background: linear-gradient(
+              180deg, 
+              rgba(234, 88, 12, 0.6), 
+              rgba(234, 88, 12, 0.8)
+            );
           }
 
           /* Firefox scrollbar */
           .modal-scroll {
             scrollbar-width: thin;
-            scrollbar-color: rgba(16, 185, 129, 0.5) rgba(17, 24, 39, 0.4);
+            scrollbar-color: rgba(234, 88, 12, 0.5) rgba(30, 25, 25, 0.4);
           }
         `}</style>
+
       </motion.div>
     </AnimatePresence>
   );

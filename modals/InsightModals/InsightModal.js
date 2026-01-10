@@ -1,11 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import AnomalyDetails from "./AnomalyDetails";
-import { X } from "lucide-react";
+import { Activity, AlertOctagon, Eye, X } from "lucide-react";
 
 const InsightModal = ({ insight, onClose }) => {
-  // const isProphet = insight.meta?.modelType === 'prophet';
-  // const isAnomaly = insight.meta?.modelType === 'anomaly';
+  
   useEffect(() => {
     if (insight) {
       document.body.style.overflow = 'hidden';
@@ -65,9 +64,10 @@ const InsightModal = ({ insight, onClose }) => {
               transition={{ delay: 0.2 }}
               className="flex items-center gap-3"
             >
-              <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <Activity className="w-6 h-6 text-emerald-400 animate-pulse" />
+
               <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">
-                FinSight-AI Insight Details
+                Anomaly Details
               </h2>
             </motion.div>
           </div>
