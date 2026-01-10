@@ -81,7 +81,7 @@ const Footer = () => {
                                 <nav className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-1">
                                     {[
                                         { href: "/About", text: "About Us" },
-                                        { href: "/#features", text: "Features" },
+                                        { href: "/Features", text: "Features" },
                                         { href: "/pricing", text: "Pricing" },
                                         { href: "/contact", text: "Contact" },
                                         { href: "/Privacy", text: "Privacy Policy" },
