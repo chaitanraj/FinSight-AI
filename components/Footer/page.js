@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapPin, Phone, Mail, DollarSign, TrendingUp, PieChart } from 'lucide-react';
+import Link from 'next/link';
 
 const Footer = () => {
     return (
@@ -79,21 +80,21 @@ const Footer = () => {
                                 <h3 className="text-xl font-semibold text-emerald-300 mb-1">Quick Links</h3>
                                 <nav className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-1">
                                     {[
-                                        { href: "/about", text: "About Us" },
-                                        { href: "/features", text: "Features" },
+                                        { href: "/About", text: "About Us" },
+                                        { href: "/#features", text: "Features" },
                                         { href: "/pricing", text: "Pricing" },
                                         { href: "/contact", text: "Contact" },
-                                        { href: "/privacy-policy", text: "Privacy Policy" },
+                                        { href: "/Privacy", text: "Privacy Policy" },
                                         { href: "/terms", text: "Terms of Service" }
                                     ].map((link, index) => (
-                                        <a
+                                        <Link
                                             key={index}
                                             href={link.href}
                                             className="group flex items-center space-x-1 text-gray-300 hover:text-emerald-400 transition-all duration-300 py-0.5 px-1 rounded text-sm hover:bg-emerald-900/20 backdrop-blur-sm"
                                         >
                                             <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full group-hover:bg-emerald-400 transition-colors duration-300"></div>
                                             <span className="font-medium">{link.text}</span>
-                                        </a>
+                                        </Link>
                                     ))}
                                 </nav>
                             </div>

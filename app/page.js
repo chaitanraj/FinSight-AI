@@ -168,7 +168,7 @@ export default function Home() {
 
 
         {/* Features Section */}
-        <section className="py-4">
+        <section className="py-4" id="features">
           <div className="text-center mb-16">
             <p className="text-emerald-500 font-semibold mb-3">INTELLIGENT INSIGHTS</p>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
