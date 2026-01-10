@@ -27,7 +27,7 @@ const InsightModal = ({ insight, onClose }) => {
       >
         <motion.div
           onClick={(e) => e.stopPropagation()}
-          className="bg-gradient-to-br from-gray-900 via-gray-900 to-emerald-950/30 rounded-2xl w-full max-w-2xl max-h-[80vh] relative border border-emerald-500/20 shadow-2xl shadow-emerald-500/10 flex flex-col overflow-hidden"
+          className="bg-gradient-to-br from-gray-900 via-gray-900 to-emerald-950/30 rounded-2xl w-full max-w-2xl max-h-[85vh] relative border border-emerald-500/20 shadow-2xl shadow-emerald-500/10 flex flex-col overflow-hidden"
           initial={{ scale: 0.8, y: 50, opacity: 0 }}
           animate={{ scale: 1, y: 0, opacity: 1 }}
           exit={{ scale: 0.8, y: 50, opacity: 0 }}
@@ -65,7 +65,7 @@ const InsightModal = ({ insight, onClose }) => {
             >
               <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">
-                FinSightAI Insight Details
+                FinSight-AI Insight Details
               </h2>
             </motion.div>
           </div>

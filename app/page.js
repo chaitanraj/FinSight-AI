@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { ArrowRight, TrendingUp, ChartPie as PieChart, Shield, CircleCheck as CheckCircle2, Smartphone, CreditCard, ChartBar as BarChart3, Clock, Calculator, FileCheck, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
@@ -40,12 +41,12 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <button className="group px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
+                <Link href="/Dashboard" className="group px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 flex cursor-pointer items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
                   Get Started
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </button>
-                <button className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-emerald-500/30 rounded-full font-semibold transition-all duration-300 shadow-md hover:shadow-lg">
-                  Explore a Demo
+                </Link>
+                <button className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-emerald-500/30 rounded-full cursor-pointer font-semibold transition-all duration-300 shadow-md hover:shadow-lg">
+                  Chat with our AI assistant
                 </button>
               </div>
 
@@ -201,10 +202,10 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-12">
-            <button className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
-              Explore All Features
+            <Link href="/Dashboard" className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
+              Explore FinSight-AI
               <ArrowRight className="w-5 h-5" />
-            </button>
+            </Link>
           </div>
         </section>
 
@@ -301,10 +302,10 @@ export default function Home() {
                 ))}
               </div>
 
-              <button className="mt-8 px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
+              {/* <button className="mt-8 px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
                 Start Now
                 <ArrowRight className="w-5 h-5" />
-              </button>
+              </button> */}
             </div>
           </div>
         </section>
@@ -353,10 +354,10 @@ export default function Home() {
           </div>
 
           <div className="text-center mt-12">
-            <button className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
+            <Link href="/Dashboard" className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 inline-flex cursor-pointer items-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
               Get Started
               <ArrowRight className="w-5 h-5" />
-            </button>
+            </Link>
           </div>
         </section>
 
@@ -367,7 +368,7 @@ export default function Home() {
               Frequently Asked Questions
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              We answered all the FAQ's you've always had, be sure to ask more in case of doubts
+              We answered all the FAQ&apos;s you&Apos;ve always had, be sure to ask more in case of doubts
             </p>
           </div>
 

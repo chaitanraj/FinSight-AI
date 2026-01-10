@@ -118,15 +118,15 @@ const Page = () => {
 
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden ">
-                      <button
+                      <Link href="/Dashboard"
                         onClick={() => {
                           setIsDropdownOpen(false);
                         }}
                         className="w-full px-4 py-3 flex items-center gap-3 hover:bg-emerald-50 transition-colors duration-200 text-gray-700 hover:text-emerald-700 cursor-pointer"
                       >
                         <Compass className="w-4 h-4" />
-                        <span className="font-medium cursor-pointer">Explore</span>
-                      </button>
+                        <span className="font-medium cursor-pointer">Add Expense</span>
+                      </Link>
                       
                       {/* Settings Button */}
                       {/* <button
