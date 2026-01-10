@@ -3,21 +3,26 @@ import { useState, useEffect } from 'react';
 import { ArrowRight, TrendingUp, ChartPie as PieChart, Shield, CircleCheck as CheckCircle2, Smartphone, CreditCard, ChartBar as BarChart3, Clock, Calculator, FileCheck, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
+
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
   const [openFaq, setOpenFaq] = useState(null);
+
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
+
   const toggleFaq = (index) => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
+
   return (
     <div className="min-h-screen w-full overflow-x-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
 
         {/* Hero Section */}
         <section className="pt-16 pb-20 lg:pt-24 lg:pb-32">
@@ -30,49 +35,52 @@ export default function Home() {
             >
               <div className="inline-block mb-6">
                 <span className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-medium text-gray-200 shadow-sm border border-emerald-500/20">
-                  Your Money, Your Control
+                  AI-Powered Financial Intelligence
                 </span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-                Take Control of Your Financial Future
+                Predict Your Spending, <span className="text-emerald-400">Master Your Future</span>
               </h1>
               <p className="text-lg text-gray-300 mb-8 leading-relaxed">
-                Manage your money effortlessly with our AI-powered financial tools. Track spending, budget smartly, and achieve your financial goals faster.
+                FinSight AI goes beyond tracking. We use advanced AI to categorize expenses automatically, detect spending anomalies, and forecast your future financial health.
               </p>
+
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <Link href="/Dashboard" className="group px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 flex cursor-pointer items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
-                  Get Started
+                  Start Forecasting
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <button className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-emerald-500/30 rounded-full cursor-pointer font-semibold transition-all duration-300 shadow-md hover:shadow-lg">
-                  Chat with our AI assistant
+                  See How AI Works
                 </button>
               </div>
 
+
               {/* Trust Badges */}
               <div>
-                <p className="text-sm text-gray-400 mb-4">Trusted by 250+ local and remote teams</p>
+                <p className="text-sm text-gray-400 mb-4">Powered by advanced machine learning models</p>
                 <div className="flex flex-wrap gap-8 items-center opacity-60">
                   <div className="flex items-center gap-2">
                     <Shield className="w-5 h-5 text-gray-400" />
-                    <span className="font-semibold text-gray-300">Norton</span>
+                    <span className="font-semibold text-gray-300">Secure</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-5 h-5 text-gray-400" />
-                    <span className="font-semibold text-gray-300">Coinbase</span>
+                    <span className="font-semibold text-gray-300">Smart</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <BarChart3 className="w-5 h-5 text-gray-400" />
-                    <span className="font-semibold text-gray-300">Airtable</span>
+                    <span className="font-semibold text-gray-300">Predictive</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-5 h-5 text-gray-400" />
-                    <span className="font-semibold text-gray-300">CLIFFORD</span>
+                    <span className="font-semibold text-gray-300">Accurate</span>
                   </div>
                 </div>
               </div>
             </div>
+
 
             {/* Right Content - Phone Mockup */}
             <div
@@ -87,36 +95,39 @@ export default function Home() {
                     {/* Phone Header */}
                     <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-900 rounded-b-3xl"></div>
 
+
                     {/* Content */}
                     <div className="pt-8">
                       <div className="flex justify-between items-center mb-6">
-                        <span className="text-sm text-white-600">Dashboard</span>
+                        <span className="text-sm text-white-600">FinSight Dashboard</span>
                         <Smartphone className="w-5 h-5 text-gray-400" />
                       </div>
 
+
                       {/* Balance Card */}
                       <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-3xl p-6 mb-6 text-white shadow-lg">
-                        <p className="text-sm opacity-90 mb-2">Total Balance</p>
+                        <p className="text-sm opacity-90 mb-2">Forecasted Balance</p>
                         <p className="text-3xl font-bold mb-4">$24,567.89</p>
                         <div className="flex gap-4 text-sm">
                           <div>
-                            <p className="opacity-80">Income</p>
-                            <p className="font-semibold">+$8,234</p>
+                            <p className="opacity-80">Anomaly</p>
+                            <p className="font-semibold text-red-300">Found (2)</p>
                           </div>
                           <div>
-                            <p className="opacity-80">Expenses</p>
-                            <p className="font-semibold">-$3,456</p>
+                            <p className="opacity-80">Next Month</p>
+                            <p className="font-semibold">+$450 Est.</p>
                           </div>
                         </div>
                       </div>
 
+
                       {/* Quick Actions */}
                       <div className="grid grid-cols-4 gap-3 mb-6">
                         {[
-                          { icon: TrendingUp, label: 'Transfer' },
-                          { icon: CreditCard, label: 'Payment' },
-                          { icon: PieChart, label: 'Budget' },
-                          { icon: BarChart3, label: 'Stats' }
+                          { icon: TrendingUp, label: 'Forecast' },
+                          { icon: CreditCard, label: 'Add Exp' },
+                          { icon: PieChart, label: 'Report' },
+                          { icon: BarChart3, label: 'Anomalies' }
                         ].map((item, i) => (
                           <div key={i} className="bg-white rounded-2xl p-4 text-center shadow-sm hover:shadow-md transition-shadow">
                             <item.icon className="w-6 h-6 mx-auto mb-2 text-emerald-600" />
@@ -125,13 +136,14 @@ export default function Home() {
                         ))}
                       </div>
 
+
                       {/* Transactions */}
                       <div className="space-y-3">
-                        <h3 className="text-sm font-semibold text-white-700">Recent</h3>
+                        <h3 className="text-sm font-semibold text-white-700">Recent AI Insights</h3>
                         {[
-                          { name: 'Shopping', amount: '-$156', color: 'bg-red-100 text-red-600' },
-                          { name: 'Salary', amount: '+$5,230', color: 'bg-green-100 text-green-600' },
-                          { name: 'Restaurant', amount: '-$89', color: 'bg-red-100 text-red-600' }
+                          { name: 'Unusual Spike', amount: 'Warning', color: 'bg-red-100 text-red-600' },
+                          { name: 'Shopping Trend', amount: '+15%', color: 'bg-green-100 text-green-600' },
+                          { name: 'Predicted Bills', amount: '$450', color: 'bg-blue-100 text-blue-600' }
                         ].map((item, i) => (
                           <div key={i} className="bg-white rounded-xl p-3 flex justify-between items-center shadow-sm">
                             <span className="text-sm font-medium text-gray-700">{item.name}</span>
@@ -145,8 +157,8 @@ export default function Home() {
                 <div className="absolute -right-4 top-32 bg-white rounded-3xl shadow-xl p-4 w-40 transform hover:scale-105 transition-transform duration-500 hidden lg:block">
                   <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-4 text-white">
                     <BarChart3 className="w-6 h-6 mb-2" />
-                    <p className="text-xs mb-1">Monthly Report</p>
-                    <p className="text-xl font-bold">+23%</p>
+                    <p className="text-xs mb-1">Prediction Accuracy</p>
+                    <p className="text-xl font-bold">94%</p>
                   </div>
                 </div>
               </div>
@@ -154,36 +166,38 @@ export default function Home() {
           </div>
         </section>
 
+
         {/* Features Section */}
         <section className="py-4">
           <div className="text-center mb-16">
-            <p className="text-emerald-500 font-semibold mb-3">POWERFUL FEATURES</p>
+            <p className="text-emerald-500 font-semibold mb-3">INTELLIGENT INSIGHTS</p>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-              Powerful Features to Take Control<br />of Your Finances
+              AI Models That Understand<br />Your Spending Habits
             </h2>
             <p className="text-gray-300 max-w-2xl mx-auto">
-              Discover an intuitive, powerful financial management platform that adapts to your lifestyle and helps you reach your financial goals.
+              Don&apos;t just track where your money went. Understand why it went there and predict where it will go next with our triple-model AI system.
             </p>
           </div>
+
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 icon: TrendingUp,
-                title: 'Expense Tracking',
-                description: 'Track your daily expenses easily and manage spending habits with our intuitive categorization system.',
+                title: 'Smart Categorization',
+                description: 'Stop manually tagging expenses. Our AI analyzes your transaction details and automatically categorizes them into shopping, bills, food, and more.',
                 delay: '0'
               },
               {
                 icon: PieChart,
-                title: 'Budget Planning',
-                description: 'Set budget targets for your expenses and never go over budget again with smart alerts and insights.',
+                title: 'Expense Forecasting',
+                description: 'Our Forecast Model analyzes your historical data to predict next month’s spending for specific categories, helping you budget proactively.',
                 delay: '200'
               },
               {
                 icon: Shield,
-                title: 'Multi-Account Support',
-                description: 'Manage all your bank accounts in one place. View consolidated reports and track your entire portfolio.',
+                title: 'Anomaly Detection',
+                description: 'Spot unusual activity instantly. We flag days with irregular spending spikes so you can investigate and adjust your habits immediately.',
                 delay: '400'
               }
             ].map((feature, i) => (
@@ -201,17 +215,20 @@ export default function Home() {
             ))}
           </div>
 
+
           <div className="text-center mt-12">
             <Link href="/Dashboard" className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
-              Explore FinSight-AI
+              Try FinSight AI Now
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
         </section>
 
+
         {/* Steps Section */}
         <section className="py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
+
 
             {/* Phone Mockup - Transactions */}
             <div
@@ -224,25 +241,27 @@ export default function Home() {
                   <div className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-[2rem] p-6 h-[600px] relative overflow-hidden">
                     <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-900 rounded-b-3xl"></div>
 
+
                     <div className="pt-8 text-white">
                       <div className="flex justify-between items-center mb-8">
-                        <h2 className="text-2xl font-bold">Transactions</h2>
-                        <span className="text-sm bg-white/20 px-4 py-2 rounded-full">This week</span>
+                        <h2 className="text-2xl font-bold">Categories</h2>
+                        <span className="text-sm bg-white/20 px-4 py-2 rounded-full">Auto-Sorted</span>
                       </div>
+
 
                       <div className="space-y-4">
                         {[
-                          { name: 'Payroll', company: 'Spotify', amount: '$50.00', color: 'bg-green-400' },
-                          { name: 'Food & Coffee', company: 'Starbucks', amount: '$28.00', color: 'bg-pink-400' },
-                          { name: 'EB & Net', company: 'Electric Co.', amount: '$15.00', color: 'bg-blue-400' },
-                          { name: 'Payroll', company: 'Google', amount: '$62.00', color: 'bg-green-400' }
+                          { name: 'Grocery Run', company: 'Walmart', amount: '$150.00', color: 'bg-green-400' },
+                          { name: 'Tech Upgrade', company: 'Apple Store', amount: '$999.00', color: 'bg-pink-400' },
+                          { name: 'Utilities', company: 'City Power', amount: '$120.00', color: 'bg-blue-400' },
+                          { name: 'Dining Out', company: 'Local Bistro', amount: '$65.00', color: 'bg-green-400' }
                         ].map((transaction, i) => (
                           <div
                             key={i}
                             className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 flex items-center gap-4 hover:bg-white/20 transition-colors duration-300"
                           >
                             <div className={`w-12 h-12 ${transaction.color} rounded-xl flex items-center justify-center`}>
-                              <CreditCard className="w-6 h-6 text-white" />
+                              <PieChart className="w-6 h-6 text-white" />
                             </div>
                             <div className="flex-1">
                               <p className="font-semibold">{transaction.name}</p>
@@ -258,36 +277,38 @@ export default function Home() {
               </div>
             </div>
 
+
             {/* Right Content */}
             <div
               className={`order-1 lg:order-2 transition-all duration-1000 delay-300 transform ${
                 isVisible ? 'translate-x-0 opacity-100' : 'translate-x-10 opacity-0'
               }`}
             >
-              <p className="text-emerald-500 font-semibold mb-3">SIMPLE SETUP</p>
+              <p className="text-emerald-500 font-semibold mb-3">EASY WORKFLOW</p>
               <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-                Manage Your Finances in<br />3 Simple Steps
+                From Input to Insight<br />in 3 Steps
               </h2>
               <p className="text-gray-300 mb-8 leading-relaxed">
-                Getting started with financial freedom has never been easier. Follow these simple steps to take control today.
+                Simply input your expense, and let our AI handle the rest. We organize, analyze, and visualize your data instantly.
               </p>
+
 
               <div className="space-y-6">
                 {[
                   {
                     icon: Smartphone,
-                    title: 'Create Your Free Account in Minutes',
-                    description: 'Get started quickly with our simple signup process. No credit card required.'
+                    title: 'Add Your Expense',
+                    description: 'Simply enter the amount and description. No need to manually select categories or tags.'
                   },
                   {
                     icon: CreditCard,
-                    title: 'Set Smart Reports Instantly',
-                    description: 'Connect your accounts and get instant insights into your spending patterns.'
+                    title: 'AI Sorts & Categorizes',
+                    description: 'Our intelligent model instantly recognizes "Starbucks" as Food/Drink or "Uber" as Transport.'
                   },
                   {
                     icon: CheckCircle2,
-                    title: 'Track Spending & Stay on Budget',
-                    description: 'Monitor your expenses in real-time and receive alerts when you approach your limits.'
+                    title: 'Get Forecasts & Visuals',
+                    description: 'View your data in beautiful pie charts and see predictions for your upcoming month.'
                   }
                 ].map((step, i) => (
                   <div key={i} className="flex gap-4 group">
@@ -301,43 +322,40 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-
-              {/* <button className="mt-8 px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 inline-flex items-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
-                Start Now
-                <ArrowRight className="w-5 h-5" />
-              </button> */}
             </div>
           </div>
         </section>
 
+
         {/* Why Thousands Trust Section */}
         <section className="py-20">
           <div className="text-center mb-16">
-            <p className="text-emerald-500 font-semibold mb-3">WHY THOUSANDS TRUST US</p>
+            <p className="text-emerald-500 font-semibold mb-3">DATA-DRIVEN DECISIONS</p>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
-              Why Thousands Trust FinSight-AI
+              Why Users Rely on FinSight AI
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              Eliminate time-consuming manual calculations and empower teams with advanced insights
+              Stop guessing where your money goes. Use advanced analytics to pinpoint anomalies and plan for the future.
             </p>
           </div>
+
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 icon: Clock,
-                title: 'Save Time on Manual Calculations',
-                description: 'Automate complex financial calculations and spend more time on strategic planning instead of tedious number crunching.'
+                title: 'Detect Anomalies Instantly',
+                description: 'Our anomaly detection model scans every transaction to flag unusual spending days that deviate from your normal patterns.'
               },
               {
                 icon: Calculator,
-                title: 'Get Real-Time Financial Insights',
-                description: 'Access up-to-date financial data and analytics instantly, enabling faster decision-making and better outcomes.'
+                title: 'Predict Future Spending',
+                description: 'Using the Prophet model, we analyze historical data to give you accurate forecasts for next month’s category-wise expenses.'
               },
               {
                 icon: FileCheck,
-                title: 'Stay on Top of Budgets',
-                description: 'Monitor your spending in real-time with smart alerts that keep you informed when you approach budget limits.'
+                title: 'Visual Clarity',
+                description: 'See your financial health at a glance with interactive pie charts and clean UI dashboards designed for clarity.'
               }
             ].map((trust, i) => (
               <div
@@ -353,6 +371,7 @@ export default function Home() {
             ))}
           </div>
 
+
           <div className="text-center mt-12">
             <Link href="/Dashboard" className="px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 inline-flex cursor-pointer items-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
               Get Started
@@ -361,60 +380,54 @@ export default function Home() {
           </div>
         </section>
 
+
         {/* FAQ Section */}
         <section className="mb-25">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 ">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4">
               Frequently Asked Questions
             </h2>
             <p className="text-gray-400 max-w-2xl mx-auto">
-              We answered all the FAQ&apos;s you&Apos;ve always had, be sure to ask more in case of doubts
+              Everything you need to know about FinSight AI&apos;s forecasting and anomaly detection.
             </p>
           </div>
 
+
           {/* <div className="max-w-3xl mx-auto space-y-4"> */}
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
             {[
               {
-                question: 'What services does FinSight-AI offer?',
-                answer: 'We offer a range of financial management services including expense tracking, budget planning, real-time financial insights, multi-account support, and automated calculations to help you achieve your financial goals.'
+                question: 'How does the Smart Categorization work?',
+                answer: 'We use a trained AI model that reads your transaction description. Whether you write "Mcdonalds" or "Uber Trip", our system automatically assigns it to categories like Food or Transport without manual input.'
               },
               {
-                question: 'How long does a typical project take?',
-                answer: 'Setup is quick and easy. You can have your account fully configured and start tracking your finances within minutes. Most users complete their initial setup in under 10 minutes.'
+                question: 'What is the "Anomaly Detection" feature?',
+                answer: 'Our anomaly model analyzes your daily spending history. If it detects a day where spending is significantly higher or unusual compared to your average, it flags it so you can review potential outliers.'
               },
               {
-                question: 'Can I see examples of your previous work?',
-                answer: 'Yes! We have helped thousands of users achieve their financial goals. Check out our success stories and testimonials from satisfied customers who have transformed their financial management.'
-              },
-            //   {
-            //     question: 'Can I see examples of your previous work?',
-            //     answer: 'Yes! We have helped thousands of users achieve their financial goals. Check out our success stories and testimonials from satisfied customers who have transformed their financial management.'
-            //   },
-              {
-                question: 'How do I get started with FinSight-AI?',
-                answer: 'Getting started is simple. Click the "Get Started" button, create your free account, connect your financial accounts, and you\'re ready to go. No credit card required for the basic plan.'
-              },
-            //   {
-            //     question: 'What is your design process?',
-            //     answer: 'We believe in user-centered design. Our intuitive interface was built based on feedback from thousands of users, ensuring a seamless experience that makes financial management feel effortless.'
-            //   },
-              {
-                question: 'What industries do you work with?',
-                answer: 'FinSight-AI works with individuals, freelancers, small businesses, and enterprises across all industries. Whether you\'re managing personal finances or business accounts, our platform adapts to your needs.'
+                question: 'How accurate is the monthly forecast?',
+                answer: 'We utilize the Meta Prophet model, which is designed for time-series forecasting. It learns from your past months\' data to predict future trends, becoming more accurate as you add more data.'
               },
               {
-                question: 'How can I contact you?',
-                answer: 'You can reach us through our contact form, email us at support@FinSight-AI.com, or use the live chat feature in your dashboard. Our support team is available 24/7 to assist you.'
+                question: 'Can I see my spending breakdowns visually?',
+                answer: 'Yes! FinSight AI generates interactive pie charts and bar graphs that break down your spending by category, helping you visualize exactly where your money is going.'
+              },
+              {
+                question: 'Is my financial data secure?',
+                answer: 'Absolutely. We prioritize your privacy and data security. Your financial data is encrypted and used solely for generating your personal insights and predictions.'
+              },
+              {
+                question: 'Do I need to manually set budgets?',
+                answer: 'While you can set manual goals, our Forecast model acts as a dynamic budget, showing you what you are likely to spend based on real habits, rather than just rigid targets.'
               }
             ].map((faq, i) => (
               <div
                 key={i}
-                className="bg-gray-900/60 backdrop-blur-sm border border-emerald-500/20 rounded-2xl overflow-hidden hover:border-emerald-500/40 transition-all duration-300"
+                className="bg-gray-900/60 backdrop-blur-sm border border-emerald-500/20 rounded-2xl overflow-hidden hover:border-emerald-500/40 transition-all duration-300 cursor-pointer"
               >
                 <button
                   onClick={() => toggleFaq(i)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-emerald-500/5 transition-colors duration-300"
+                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-emerald-500/5 transition-colors duration-300 cursor-pointer"
                 >
                   <span className="text-lg font-semibold text-white pr-4">{faq.question}</span>
                   <ChevronDown
@@ -437,7 +450,9 @@ export default function Home() {
           </div>
         </section>
 
+
       </div>
+
 
       <style jsx>{`
         @keyframes fadeInUp {
@@ -450,6 +465,7 @@ export default function Home() {
             transform: translateY(0);
           }
         }
+
 
         .animate-fadeInUp {
           animation: fadeInUp 0.8s ease-out forwards;
