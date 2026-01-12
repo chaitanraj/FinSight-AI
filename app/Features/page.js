@@ -68,7 +68,7 @@ export default function Features() {
             </ul>
           </motion.div>
           
-          <motion.div 
+                 <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -76,33 +76,56 @@ export default function Features() {
             className="relative"
           >
             {/* Abstract UI Representation */}
-            <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-3xl p-8 shadow-2xl">
-              <div className="flex justify-between items-center mb-8">
+            <div className="bg-gray-800/50 backdrop-blur-xl border border-gray-700 rounded-3xl p-8 shadow-2xl overflow-hidden relative">
+              {/* Background Glow Effect */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none"></div>
+
+              <div className="flex justify-between items-center mb-10 relative z-10">
                 <div>
-                  <p className="text-sm text-gray-400">Forecasted Balance</p>
-                  <p className="text-3xl font-bold text-white">$12,450.00</p>
+                  <p className="text-sm text-gray-400 font-medium mb-1">Forecasted Balance</p>
+                  <p className="text-4xl font-bold text-white tracking-tight">$12,450.00</p>
                 </div>
-                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-lg text-sm font-mono">+12%</span>
+                <div className="flex flex-col items-end">
+                  <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-lg text-sm font-bold border border-emerald-500/20 mb-1">+12%</span>
+                  <span className="text-xs text-gray-500">vs last month</span>
+                </div>
               </div>
-              {/* Fake Graph */}
-              <div className="h-40 flex items-end justify-between gap-2">
-                {[40, 65, 55, 80, 60, 90, 100].map((h, i) => (
-                  <div key={i} className="w-full bg-emerald-500/20 rounded-t-lg relative group">
-                    <div 
-                      className={`absolute bottom-0 w-full rounded-t-lg transition-all duration-1000 ${i > 4 ? 'bg-emerald-500/50 dashed-border' : 'bg-emerald-500'}`}
-                      style={{ height: `${h}%` }}
-                    ></div>
+
+              {/* Enhanced Graph */}
+              <div className="h-48 flex items-end justify-between gap-3 relative z-10">
+                {[40, 65, 55, 80, 60, 90, 75].map((h, i) => (
+                  <div key={i} className="w-full relative group h-full flex items-end">
+                    {/* The Bar */}
+                    <motion.div 
+                      initial={{ height: 0 }}
+                      whileInView={{ height: `${h}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, delay: i * 0.1, type: "spring" }}
+                      className={`w-full rounded-t-lg relative ${
+                        i === 6 
+                          ? 'bg-gradient-to-t from-emerald-600 to-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.5)]' 
+                          : 'bg-gray-700/50 hover:bg-gray-600 transition-colors'
+                      }`}
+                    >
+                      {/* Tooltip on Hover */}
+                      <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-gray-700">
+                        ${h * 150}
+                      </div>
+                    </motion.div>
                   </div>
                 ))}
               </div>
-              <div className="flex justify-between mt-4 text-xs text-gray-500 font-mono">
+
+              {/* X-Axis Labels */}
+              <div className="flex justify-between mt-4 text-xs text-gray-500 font-medium font-mono border-t border-gray-800 pt-4">
                 <span>Week 1</span>
                 <span>Week 2</span>
                 <span>Week 3</span>
-                <span className="text-emerald-400">Next Month (Predicted)</span>
+                <span className="text-emerald-400 font-bold">Prediction</span>
               </div>
             </div>
           </motion.div>
+
         </div>
 
         {/* 3. FEATURE 2: ANOMALY DETECTION */}
