@@ -1,18 +1,20 @@
 import React, { useCallback, useContext, useState } from 'react'
-import { TrendingDown, TrendingUp, Sparkles, Type, AlertTriangle, Info, ChevronRight, Brain, Activity } from 'lucide-react';
+import { TrendingDown, TrendingUp, Layers, Sparkles, Type, AlertTriangle, Info, ChevronRight, Brain, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AuthContext } from '@/context/AuthContext';
 import AnomalyCard from '../AnomalyCard/AnomalyCard';
 import InsightModal from '@/modals/InsightModals/InsightModal';
 import GlobalProphetCard from '../GlobalProphetCard/GlobalProphetCard';
 import GlobalProphetModal from '@/modals/GlobalProphetModal/GlobalProphetModal';
-
+import CategoryProphetModal from '@/modals/CategoryProphetModal/CategoryProphetModal';
+import CategoryProphetCard from '../CategoryProphetCard/CategoryProphetCard';
 
 const MasterCard = () => {
   const [selectedInsight, setSelectedInsight] = useState(null);
 
   const INSIGHT_UI = {
     warning: {
+      // anomaly 
       icon: Activity,
       bg: "bg-amber-500/10 border-amber-500/30",
       iconColor: "text-amber-400",
@@ -25,34 +27,24 @@ const MasterCard = () => {
       sweep: "via-emerald-400/10",
     },
     info: {
-      icon: Activity,
+      // category_prediction
+      icon: Layers,
       bg: "bg-cyan-500/10 border-cyan-500/30",
       iconColor: "text-cyan-400",
       sweep: "via-cyan-400/10",
     },
     prediction: {
-  icon: Brain,
-  bg: "bg-purple-500/10 border-purple-400/40",
-  iconColor: "text-purple-300",
-  sweep: "via-purple-300/15",
-},
+      // prophet prediction
+      icon: Brain,
+      bg: "bg-purple-700/10 border-purple-600/30",
+      iconColor: "text-purple-500",
+      sweep: "via-purple-500/10",
+    },
     drop: {
       icon: TrendingDown,
       bg: "bg-green-500/10 border-green-500/30",
       iconColor: "text-green-400",
       sweep: "via-green-400/10",
-    },
-    trend: {
-      icon: Activity,
-      bg: "bg-purple-500/10 border-purple-500/30",
-      iconColor: "text-purple-400",
-      sweep: "via-purple-400/10",
-    },
-    learning: {
-      icon: Brain,
-      bg: "bg-gray-500/10 border-gray-500/30",
-      iconColor: "text-gray-400",
-      sweep: "via-gray-400/10",
     },
   };
 
@@ -71,6 +63,7 @@ const MasterCard = () => {
     <div>
       <AnomalyCard onInsight={addInsight} />
       <GlobalProphetCard onInsight={addInsight} />
+      <CategoryProphetCard onInsight={addInsight} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -363,15 +356,11 @@ const MasterCard = () => {
       </motion.div>
 
       {selectedInsight?.meta?.modelType === 'prophet' ? (
-        <GlobalProphetModal
-          insight={selectedInsight}
-          onClose={() => setSelectedInsight(null)}
-        />
+        <GlobalProphetModal insight={selectedInsight} onClose={() => setSelectedInsight(null)} />
+      ) : selectedInsight?.meta?.modelType === 'category_prophet' ? (
+        <CategoryProphetModal insight={selectedInsight} onClose={() => setSelectedInsight(null)} />
       ) : (
-        <InsightModal
-          insight={selectedInsight}
-          onClose={() => setSelectedInsight(null)}
-        />
+        <InsightModal insight={selectedInsight} onClose={() => setSelectedInsight(null)} />
       )}
     </div>
   )

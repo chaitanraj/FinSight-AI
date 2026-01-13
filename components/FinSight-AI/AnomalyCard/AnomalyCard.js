@@ -73,7 +73,7 @@ const AnomalyCard = ({ onInsight }) => {
                 const displayAnomalyDays = anomaly_days > 10 ? "10+" : anomaly_days.toString();
 
                 onInsight({
-                    type: insightType,
+                    type: "warning",
                     message: message,
                     meta: {
                         modelType: 'anomaly',
