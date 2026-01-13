@@ -158,6 +158,14 @@ const MasterCard = () => {
                 >
                   Intelligent insights will appear here as patterns emerge
                 </motion.p>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4 }}
+                  className="text-gray-400 text-sm"
+                >
+                  Keep adding expenses for better insights.
+                </motion.p>
 
                 <motion.div
                   initial={{ opacity: 0 }}
