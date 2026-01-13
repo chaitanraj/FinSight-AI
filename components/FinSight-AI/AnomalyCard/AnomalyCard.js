@@ -31,14 +31,14 @@ const AnomalyCard = ({ onInsight }) => {
                 console.log(data);
                 const { anomalies, anomaly_days, average_expense } = data;
 
-                let anomalydays="";
+                let dispalyAnomlayDays="";
                 if (average_expense < 500) return;
                 const meaningful=anomalies;
                 
                 if(anomaly_days>10)
-                    anomalydays="10+";
+                    dispalyAnomlayDays="10+";
                 else
-                    anomalydays=anomaly_days
+                    dispalyAnomlayDays=anomaly_days
 
                 if (meaningful.length === 0) {
                     onInsight({
@@ -60,7 +60,8 @@ const AnomalyCard = ({ onInsight }) => {
                     type: "warning",
                     message: text,
                     meta: {
-                        anomalyDays: anomalydays,
+                        anomalyDays: anomaly_days,
+                        display:dispalyAnomlayDays,
                         anomalies: meaningful,
                         averageExpense: average_expense
                     },

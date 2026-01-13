@@ -8,28 +8,28 @@ const GlobalProphetModal = ({ insight, onClose }) => {
     if (insight) {
       document.body.style.overflow = 'hidden';
     }
-    
+
     return () => {
       document.body.style.overflow = 'unset';
     };
   }, [insight]);
-    
+
   if (!insight || insight.meta?.modelType !== 'prophet') return null;
 
-  const { 
-    predictionValue, 
-    lastMonthActual, 
-    trendPercent, 
+  const {
+    predictionValue,
+    lastMonthActual,
+    trendPercent,
     confidence,
     displayValue,
-    showWarning 
+    showWarning
   } = insight.meta;
 
   const difference = predictionValue - lastMonthActual;
   const isIncrease = difference > 0;
-  const confidenceWidth = 
-    confidence === 'high' ? 100 : 
-    confidence === 'medium' ? 66 : 33;
+  const confidenceWidth =
+    confidence === 'high' ? 100 :
+      confidence === 'medium' ? 66 : 33;
 
   return (
     <AnimatePresence>
@@ -48,13 +48,13 @@ const GlobalProphetModal = ({ insight, onClose }) => {
           // CHANGED: Added flex flex-col, REMOVED overflow/modal-scroll
           className="bg-gradient-to-br from-gray-900 via-gray-900 to-emerald-950/30 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col"
         >
-          
+
           {/* Header - Fixed */}
           {/* CHANGED: Added flex-none */}
           <div className="flex-none sticky top-0 bg-gray-900/95 backdrop-blur border-b border-gray-800 p-6 flex items-center justify-between z-10 rounded-t-2xl">
             <div className="flex items-center gap-3">
               <motion.div
-                animate={{ 
+                animate={{
                   rotate: [0, 10, -10, 0],
                   scale: [1, 1.1, 1]
                 }}
@@ -81,9 +81,9 @@ const GlobalProphetModal = ({ insight, onClose }) => {
           {/* Scrollable Content Container */}
           {/* CHANGED: Added wrapper div with flex-1, overflow-y-auto, modal-scroll */}
           <div className="flex-1 overflow-y-auto modal-scroll p-6">
-            
+
             {/* Confidence message */}
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="text-gray-200 text-center mb-6"
@@ -92,9 +92,10 @@ const GlobalProphetModal = ({ insight, onClose }) => {
             </motion.p>
 
             <div className="space-y-6">
-              
+
               {/* Warning Banner */}
-              {showWarning && (
+              {/* Warning/Info Banners */}
+              {confidence === 'low' && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -102,16 +103,36 @@ const GlobalProphetModal = ({ insight, onClose }) => {
                 >
                   <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-extrabold  text-amber-400">Low Confidence Prediction</p>
+                    <p className="text-sm font-extrabold text-amber-400">Limited Data Available</p>
                     <p className="text-sm text-gray-300 mt-1">
-                      This forecast may be less accurate due to limited historical data or high spending variability. 
-                      Add more expense data for better predictions.
+                      We need more expense history to make accurate predictions. Keep tracking for at least 3-6 months for reliable forecasts.
                     </p>
                   </div>
                 </motion.div>
               )}
-
-              {/* Stats Grid */}
+              {confidence === 'medium' && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 flex items-start gap-3"
+                >
+                  <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-extrabold text-blue-400">
+                      {Math.abs(trendPercent) > 30 ? 'Significant Change Detected' : 'Reliable Prediction'}
+                    </p>
+                    <p className="text-sm text-gray-300 mt-1">
+                      {Math.abs(trendPercent) > 30
+                        ? `This ${trendPercent > 0 ? 'increase' : 'decrease'} is notable. ${trendPercent > 0
+                          ? 'Review your upcoming expenses and adjust your budget if needed.'
+                          : 'Great job reducing spending! Keep tracking to maintain this trend.'
+                        }`
+                        : 'Based on your spending history, this forecast is reliable. Factor it into your monthly budget planning.'
+                      }
+                    </p>
+                  </div>
+                </motion.div>
+              )}  {/* Stats Grid */}
               <div className="grid grid-cols-2 gap-4">
                 {/* Last Month */}
                 <motion.div
@@ -153,9 +174,8 @@ const GlobalProphetModal = ({ insight, onClose }) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className={`${
-                  isIncrease ? 'bg-red-500/10 border-red-500/30' : 'bg-green-500/10 border-green-500/30'
-                } border rounded-lg p-4`}
+                className={`${isIncrease ? 'bg-red-500/10 border-red-500/30' : 'bg-green-500/10 border-green-500/30'
+                  } border rounded-lg p-4`}
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
@@ -178,7 +198,7 @@ const GlobalProphetModal = ({ insight, onClose }) => {
                       {isIncrease ? '+' : ''}₹{Math.abs(difference).toLocaleString('en-IN')}
                     </span>
                   </div>
-                  
+
                   {/* Progress Bar */}
                   <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
                     <motion.div
@@ -203,11 +223,10 @@ const GlobalProphetModal = ({ insight, onClose }) => {
                     <Brain className="w-5 h-5 text-purple-400" />
                     <p className="text-sm font-medium text-white">Prediction Confidence</p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    confidence === 'high' ? 'bg-green-500/20 text-green-400' :
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${confidence === 'high' ? 'bg-green-500/20 text-green-400' :
                     confidence === 'medium' ? 'bg-blue-500/20 text-blue-400' :
-                    'bg-amber-500/20 text-amber-400'
-                  }`}>
+                      'bg-amber-500/20 text-amber-400'
+                    }`}>
                     {confidence.toUpperCase()}
                   </span>
                 </div>
@@ -218,11 +237,10 @@ const GlobalProphetModal = ({ insight, onClose }) => {
                     initial={{ width: 0 }}
                     animate={{ width: `${confidenceWidth}%` }}
                     transition={{ delay: 0.6, duration: 0.8 }}
-                    className={`h-full ${
-                      confidence === 'high' ? 'bg-green-500' :
+                    className={`h-full ${confidence === 'high' ? 'bg-green-500' :
                       confidence === 'medium' ? 'bg-blue-500' :
-                      'bg-amber-500'
-                    }`}
+                        'bg-amber-500'
+                      }`}
                   />
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 mt-2">
@@ -243,19 +261,19 @@ const GlobalProphetModal = ({ insight, onClose }) => {
                   <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                   <div className="space-y-2">
                     <p className="text-sm font-medium text-blue-400">What this means</p>
-                    
+
                     {trendPercent > 50 && (
                       <p className="text-xs text-gray-300">
                         • Your expenses are predicted to increase significantly. Review your upcoming bills and discretionary spending.
                       </p>
                     )}
-                    
+
                     {trendPercent > 0 && trendPercent <= 50 && (
                       <p className="text-xs text-gray-300">
                         • Moderate increase expected. This could be due to seasonal variations or planned expenses.
                       </p>
                     )}
-                    
+
                     {trendPercent < 0 && (
                       <p className="text-xs text-gray-300">
                         • Great job! Your spending is trending downward. Keep up the good financial habits.
@@ -267,7 +285,7 @@ const GlobalProphetModal = ({ insight, onClose }) => {
                         • Add more expense entries to improve prediction accuracy for future months.
                       </p>
                     )}
-                    
+
                     <p className="text-xs text-gray-300">
                       • This prediction is based on your historical spending patterns using Finsight AI forecasting.
                     </p>
@@ -292,7 +310,7 @@ const GlobalProphetModal = ({ insight, onClose }) => {
           </div>
 
         </motion.div>
-        
+
         <style jsx global>{`
           .modal-scroll {
             /* Smooth scrolling behavior */

@@ -18,28 +18,24 @@ const MasterCard = () => {
       iconColor: "text-amber-400",
       sweep: "via-amber-400/10",
     },
-
     success: {
       icon: TrendingDown,
       bg: "bg-emerald-500/10 border-emerald-500/30",
       iconColor: "text-emerald-400",
       sweep: "via-emerald-400/10",
     },
-
     info: {
       icon: Activity,
       bg: "bg-cyan-500/10 border-cyan-500/30",
       iconColor: "text-cyan-400",
       sweep: "via-cyan-400/10",
     },
-
     prediction: {
-      icon: TrendingUp,
-      bg: "bg-red-500/10 border-red-500/30",
-      iconColor: "text-red-400",
-      sweep: "via-red-400/10",
-    },
-
+  icon: Brain,
+  bg: "bg-purple-500/10 border-purple-400/40",
+  iconColor: "text-purple-300",
+  sweep: "via-purple-300/15",
+},
     drop: {
       icon: TrendingDown,
       bg: "bg-green-500/10 border-green-500/30",
@@ -281,13 +277,13 @@ const MasterCard = () => {
                             repeat: 0,
                           }}
                           className={`absolute inset-0 ${insight.type === 'warning'
-                              ? 'bg-gradient-to-r from-transparent via-yellow-400/10 to-transparent'
-                              : insight.type === 'success'
-                                ? 'bg-gradient-to-r from-transparent via-emerald-400/10 to-transparent'
-                                : insight.type === 'prediction'
-                                  ? 'bg-gradient-to-r from-transparent via-orange-400/10 to-transparent'
+                            ? 'bg-gradient-to-r from-transparent via-yellow-400/10 to-transparent'
+                            : insight.type === 'success'
+                              ? 'bg-gradient-to-r from-transparent via-emerald-400/10 to-transparent'
+                              : insight.type === 'prediction'
+                                ? 'bg-gradient-to-r from-transparent via-orange-400/10 to-transparent'
 
-                                  : 'bg-gradient-to-r from-transparent via-blue-400/10 to-transparent'
+                                : 'bg-gradient-to-r from-transparent via-blue-400/10 to-transparent'
                             }`}
                         />
 
@@ -338,7 +334,7 @@ const MasterCard = () => {
                                 ) : (
                                   <div className="flex items-center gap-1">
                                     <span className="text-3xl font-bold text-yellow-400">
-                                      {insight.meta.anomalyDays}
+                                      {insight.meta.display}
                                     </span>
                                     <span className="text-xs text-gray-300">
                                       unusual days detected

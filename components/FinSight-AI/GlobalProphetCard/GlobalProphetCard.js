@@ -95,29 +95,26 @@ const GlobalProphetCard = ({ onInsight }) => {
         let message = '';
         const MAX_MULTIPLIER = 2.0;
         let predicted = predicted_next_month;
-        let trend_per=trend_percent
+        let trend_per = trend_percent
         predicted = Math.min(predicted, last_month_actual * MAX_MULTIPLIER);
-        predicted=Math.round(predicted)
-        trend_per=Math.round(trend_per)
+        predicted = Math.round(predicted)
+        trend_per = Math.round(trend_per)
 
-        if (confidence === 'low' && trend_per > 100) {
-            insightType = 'prediction';
-            message = `Your expenses may increase to ₹${Math.max(1000, Math.floor(predicted / 1000) * 1000)}+ next month, but confidence is low. Review recent spending patterns.`;
-        } else if (confidence === 'low') {
-            insightType = 'prediction';
-            message = `Predicted expenses: ₹${Math.max(1000, Math.floor(predicted / 1000) * 1000)}+ (Low confidence - need more data for accuracy)`;
-        } else if (trend_per > 100) {
-            insightType = 'prediction';
-            message = `Expense spike detected! Predicted ₹${predicted.toLocaleString()} next month (${trend_per}% increase from ₹${last_month_actual.toLocaleString()})`;
-        } else if (trend_percent < -20) {
-            insightType = 'success';
-            message = `Great news! Expenses trending down to ₹${predicted.toLocaleString()} next month (${Math.abs(trend_percent)}% decrease)`;
-        } else {
-            insightType = 'prediction';
-            message = `Next month forecast: ₹${predicted.toLocaleString()} (${trend_percent > 0 ? '+' : ''}${trend_per}% from last month)`;
+        if (confidence === 'medium') {
+            if (trend_per > 50) {
+                insightType = 'prediction';
+                message = `Spending expected to increase significantly to ₹${predicted.toLocaleString()} next month (+${trend_per}%).`;
+            } else if (trend_per < -5) {
+                insightType = 'success';
+                message = `Great news! Expenses trending down to ₹${predicted.toLocaleString()} next month (${trend_per}%).`;
+            } else if (trend_per > 5) {
+                insightType = 'prediction';
+                message = `Spending expected to rise to ₹${predicted.toLocaleString()} next month (+${trend_per}%).`;
+            } else {
+                insightType = 'info';
+                message = `Spending stable at ~₹${predicted.toLocaleString()} next month (${trend_per > 0 ? '+' : ''}${trend_per}%).`;
+            }
         }
-
-
 
         return {
             type: insightType,
@@ -132,7 +129,7 @@ const GlobalProphetCard = ({ onInsight }) => {
                     ? `₹${Math.max(1000, Math.floor(predicted / 1000) * 1000)}`
                     : `₹${predicted.toLocaleString()}`,
                 confidenceLevel: confidence,
-                showWarning: confidence === 'low' || trend_percent > 100,
+                showWarning: confidence === 'low',
                 isPlaceholder: false
             }
         };
