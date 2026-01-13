@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import AnomalyDetails from "./AnomalyDetails";
-import { Activity, AlertOctagon, Eye, X } from "lucide-react";
+import { Activity, X } from "lucide-react";
 
 const InsightModal = ({ insight, onClose }) => {
   
@@ -15,7 +15,9 @@ const InsightModal = ({ insight, onClose }) => {
     };
   }, [insight]);
 
-  if (!insight) return null;
+  if (!insight || !insight.meta) return null;
+
+  const isAnomaly = insight.meta.modelType === 'anomaly';
 
   return (
     <AnimatePresence>
@@ -46,7 +48,6 @@ const InsightModal = ({ insight, onClose }) => {
             transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
           />
 
-          
           <motion.button
             onClick={onClose}
             className="absolute top-4 right-4 z-10 p-2 rounded-full bg-gray-800/50 hover:bg-gray-700/70 text-gray-400 hover:text-emerald-400 transition-all duration-200 backdrop-blur-sm border border-gray-700/50 hover:border-emerald-500/30 cursor-pointer"
@@ -56,7 +57,7 @@ const InsightModal = ({ insight, onClose }) => {
             <X className="w-5 h-5" />
           </motion.button>
 
-          
+          {/* Header */}
           <div className="bg-gradient-to-r from-emerald-900/20 to-transparent p-6 border-b border-emerald-500/10 flex-shrink-0">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -65,31 +66,33 @@ const InsightModal = ({ insight, onClose }) => {
               className="flex items-center gap-3"
             >
               <Activity className="w-6 h-6 text-emerald-400 animate-pulse" />
-
               <h2 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">
-                Anomaly Details
+                {isAnomaly ? 'Anomaly Details' : 'Insight Details'}
               </h2>
             </motion.div>
           </div>
 
-         
+          {/* Content */}
           <div className="p-6 overflow-y-auto flex-1 modal-scroll">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              {insight.type === "warning" && (
+              {isAnomaly ? (
                 <AnomalyDetails meta={insight.meta} />
+              ) : (
+                <div className="text-center text-gray-400 py-8">
+                  <p className="text-lg mb-2">{insight.message}</p>
+                  <p className="text-sm">No additional details available</p>
+                </div>
               )}
             </motion.div>
           </div>
         </motion.div>
 
-        
         <style jsx>{`
           .modal-scroll {
-            /* Smooth scrolling behavior */
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
@@ -114,7 +117,6 @@ const InsightModal = ({ insight, onClose }) => {
             background: linear-gradient(180deg, rgba(16, 185, 129, 0.6), rgba(16, 185, 129, 0.8));
           }
 
-          /* Firefox scrollbar */
           .modal-scroll {
             scrollbar-width: thin;
             scrollbar-color: rgba(16, 185, 129, 0.5) rgba(17, 24, 39, 0.4);
