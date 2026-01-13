@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, TrendingUp, TrendingDown, AlertTriangle, Calendar, Activity, Brain, Info } from "lucide-react";
+import { X, TrendingUp, TrendingDown,Minus, AlertTriangle, Calendar, Activity, Brain, Info } from "lucide-react";
 import { useEffect } from "react";
 
 const GlobalProphetModal = ({ insight, onClose }) => {
@@ -152,21 +152,61 @@ const GlobalProphetModal = ({ insight, onClose }) => {
                 </motion.div>
 
                 {/* Predicted */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="bg-orange-500/10 backdrop-blur border border-orange-500/30 rounded-lg p-4"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="w-4 h-4 text-orange-400" />
-                    <p className="text-xs text-orange-400 font-medium">Predicted</p>
-                  </div>
-                  <p className="text-2xl font-bold text-orange-400">
-                    {displayValue}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1">Next month forecast</p>
-                </motion.div>
+                {/* Predicted */}
+<motion.div
+  initial={{ opacity: 0, scale: 0.9 }}
+  animate={{ opacity: 1, scale: 1 }}
+  transition={{ delay: 0.2 }}
+  className={`backdrop-blur border rounded-lg p-4 ${
+    trendPercent > 5 
+      ? 'bg-orange-500/10 border-orange-500/30' 
+      : trendPercent < -5 
+      ? 'bg-green-500/10 border-green-500/30'
+      : 'bg-gray-500/10 border-gray-500/30'
+  }`}
+>
+  <div className="flex items-center gap-2 mb-2">
+    {trendPercent > 5 ? (
+      <TrendingUp className="w-4 h-4 text-orange-400" />
+    ) : trendPercent < -5 ? (
+      <TrendingDown className="w-4 h-4 text-green-400" />
+    ) : (
+      <Minus className="w-4 h-4 text-gray-400" />
+    )}
+    <p className={`text-xs font-medium ${
+      trendPercent > 5 
+        ? 'text-orange-400' 
+        : trendPercent < -5 
+        ? 'text-green-400'
+        : 'text-gray-400'
+    }`}>
+      Predicted
+    </p>
+  </div>
+  <p className={`text-2xl font-bold ${
+    trendPercent > 5 
+      ? 'text-orange-400' 
+      : trendPercent < -5 
+      ? 'text-green-400'
+      : 'text-gray-400'
+  }`}>
+    {displayValue}
+  </p>
+  <p className="text-xs text-gray-500 mt-1">
+    Next month forecast
+    {trendPercent !== undefined && (
+      <span className={`ml-1 font-medium ${
+        trendPercent > 5 
+          ? 'text-orange-400' 
+          : trendPercent < -5 
+          ? 'text-green-400'
+          : 'text-gray-400'
+      }`}>
+        ({trendPercent > 0 ? '+' : ''}{trendPercent}%)
+      </span>
+    )}
+  </p>
+</motion.div>
               </div>
 
               {/* Trend Analysis Bar */}

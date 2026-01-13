@@ -14,40 +14,36 @@ const MasterCard = () => {
 
   const INSIGHT_UI = {
     warning: {
-      // anomaly 
       icon: Activity,
-      bg: "bg-amber-500/10 border-amber-500/30",
-      iconColor: "text-amber-400",
-      sweep: "via-amber-400/10",
+      bg: "bg-red-600/10 border-red-500/40",
+      iconColor: "text-red-400",
+      sweep: "via-red-500/10",
     },
     success: {
       icon: TrendingDown,
-      bg: "bg-emerald-500/10 border-emerald-500/30",
-      iconColor: "text-emerald-400",
-      sweep: "via-emerald-400/10",
-    },
-    info: {
-      // category_prediction
-      icon: Layers,
-      bg: "bg-cyan-500/10 border-cyan-500/30",
-      iconColor: "text-cyan-400",
-      sweep: "via-cyan-400/10",
-    },
-    prediction: {
-      // prophet prediction
-      icon: Brain,
-      bg: "bg-purple-700/10 border-purple-600/30",
-      iconColor: "text-purple-500",
-      sweep: "via-purple-500/10",
-    },
-    drop: {
-      icon: TrendingDown,
-      bg: "bg-green-500/10 border-green-500/30",
+      bg: "bg-green-600/10 border-green-500/35",
       iconColor: "text-green-400",
       sweep: "via-green-400/10",
     },
+    info: {
+      icon: Layers,
+      bg: "bg-blue-600/10 border-blue-500/35",
+      iconColor: "text-blue-400",
+      sweep: "via-blue-400/10",
+    },
+    prediction: {
+      icon: Brain,
+      bg: "bg-purple-700/10 border-purple-600/35",
+      iconColor: "text-black-900",
+      sweep: "via-purple-400/10",
+    },
+    drop: {
+      icon: Brain,
+      bg: "bg-cyan-600/10 border-cyan-500/35",
+      iconColor: "text-cyan-400",
+      sweep: "via-cyan-400/10",
+    },
   };
-
 
   const [aiInsights, setAiInsights] = useState([]);
 
@@ -324,6 +320,15 @@ const MasterCard = () => {
                                       predicted
                                     </span>
                                   </div>
+                                ) : insight.meta.modelType === 'category_prophet' ? (
+                                  <div className="flex items-center gap-1">
+                                    <span className="text-3xl font-bold text-yellow-400">
+                                      {insight.meta.display}
+                                    </span>
+                                    <span className="text-xs text-gray-300">
+                                      categories predicted
+                                    </span>
+                                  </div>
                                 ) : (
                                   <div className="flex items-center gap-1">
                                     <span className="text-3xl font-bold text-yellow-400">
@@ -335,7 +340,6 @@ const MasterCard = () => {
                                   </div>
                                 )}
                               </div>
-
                               <button
                                 className="cursor-pointer absolute bottom-3 right-3 text-md text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors z-20"
                               >
