@@ -21,7 +21,7 @@ function SignupPage() {
       return;
     }
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/signup`, {
+      const res = await fetch(`/api/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
