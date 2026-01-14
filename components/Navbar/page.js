@@ -10,7 +10,7 @@ import {toast} from 'react-toastify';
 
 const Page = () => {
   const [activeItem, setactiveItem] = useState('');
-  const navItems = ["About", "Features", "Dashboard"];
+  const navItems = ["About", "Features","Pricing", "Dashboard"];
   const navRef = useRef(null);
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
