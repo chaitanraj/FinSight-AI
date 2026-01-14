@@ -82,10 +82,10 @@ const Footer = () => {
                                     {[
                                         { href: "/About", text: "About Us" },
                                         { href: "/Features", text: "Features" },
-                                        { href: "/pricing", text: "Pricing" },
-                                        { href: "/contact", text: "Contact" },
+                                        // { href: "/pricing", text: "Pricing" },
+                                        // { href: "/contact", text: "Contact" },
                                         { href: "/Privacy", text: "Privacy Policy" },
-                                        { href: "/terms", text: "Terms of Service" }
+                                        { href: "/Terms", text: "Terms of Service" }
                                     ].map((link, index) => (
                                         <Link
                                             key={index}

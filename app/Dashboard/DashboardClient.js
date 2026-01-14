@@ -21,7 +21,7 @@ import {
   HeartPulse,
   HelpCircle
 } from 'lucide-react';
-import AddExpenseModal from '@/components/AddExpenseModal/page';
+import AddExpenseModal from '@/modals/AddExpenseModal/page';
 import ExpenseCalendar from '@/components/GoToCalendar/GoToCalendar';
 import { useRef } from 'react';
 import { timeZoneHelper } from '@/utils/timeZoneHelper';
@@ -87,9 +87,9 @@ const PieChart = ({ data, total }) => {
 
   if (!data || data.length === 0) {
     return (
-      <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto flex items-center justify-center">
-        <div className="w-40 h-40 sm:w-44 sm:h-44 md:w-48 md:h-48 rounded-full border-4 border-gray-800 flex items-center justify-center">
-          <span className="text-gray-600 text-sm">No data yet</span>
+      <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto flex items-center justify-center">
+        <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 lg:w-48 lg:h-48 rounded-full border-4 border-gray-800 flex items-center justify-center">
+          <span className="text-gray-600 text-xs sm:text-sm">No data yet</span>
         </div>
       </div>
     );
@@ -126,7 +126,7 @@ const PieChart = ({ data, total }) => {
   };
 
   return (
-    <div className="relative w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto flex-shrink-0">
+    <div className="relative w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 mx-auto flex-shrink-0">
       <svg width="100%" height="100%" viewBox="0 0 256 256" className="mx-auto">
         <circle cx="128" cy="128" r="60" fill="#0a0f1a" />
         {segments.map((segment) => (
@@ -153,9 +153,9 @@ const PieChart = ({ data, total }) => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 px-4 py-2 rounded-lg border border-gray-700 pointer-events-none whitespace-nowrap"
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 px-3 py-2 sm:px-4 rounded-lg border border-gray-700 pointer-events-none whitespace-nowrap"
           >
-            <p className="text-sm font-medium text-white">{segments[hoveredSegment].category}</p>
+            <p className="text-xs sm:text-sm font-medium text-white">{segments[hoveredSegment].category}</p>
             <p className="text-xs text-emerald-400">{segments[hoveredSegment].percentage.toFixed(1)}%</p>
           </motion.div>
         )}
@@ -167,19 +167,19 @@ const PieChart = ({ data, total }) => {
 const ExpenseTypeCard = ({ icon: Icon, label, amount, color }) => (
   <motion.div
     whileHover={{ scale: 1.05, y: -2 }}
-    className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-4 hover:border-emerald-500/30 transition-all cursor-pointer"
+    className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-3 sm:p-4 hover:border-emerald-500/30 transition-all cursor-pointer"
   >
     <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className={`w-7 h-9 rounded-lg ${color} bg-opacity-10 flex items-center justify-center`}>
-          <Icon className={`w-5 h-5 ${color.replace('bg-', 'text-')}`} />
+      <div className="flex items-center gap-2 sm:gap-3">
+        <div className={`w-6 h-6 sm:w-7 sm:h-9 rounded-lg ${color} bg-opacity-10 flex items-center justify-center`}>
+          <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${color.replace('bg-', 'text-')}`} />
         </div>
         <div>
-          <p className="text-sm text-gray-400">{label}</p>
-          <p className="text-lg font-semibold text-white">₹{amount.toLocaleString()}</p>
+          <p className="text-xs sm:text-sm text-gray-400">{label}</p>
+          <p className="text-base sm:text-lg font-semibold text-white">₹{amount.toLocaleString()}</p>
         </div>
       </div>
-      <ArrowUpRight className="w-4 h-4 text-gray-600" />
+      <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
     </div>
   </motion.div>
 );
@@ -189,22 +189,22 @@ const RecentExpenseRow = ({ date, merchant, amount, category, categoryColor }) =
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
     whileHover={{ backgroundColor: 'rgba(16, 185, 129, 0.05)' }}
-    className="grid grid-cols-4 gap-4 p-4 rounded-lg border border-gray-800 hover:border-emerald-500/30 transition-all"
+    className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 p-3 sm:p-4 rounded-lg border border-gray-800 hover:border-emerald-500/30 transition-all"
   >
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
-        <Calendar className="w-5 h-5 text-emerald-400" />
+    <div className="flex items-center gap-2 sm:gap-3 col-span-2 sm:col-span-1">
+      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0">
+        <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
       </div>
-      <span className="text-gray-300">{date}</span>
+      <span className="text-sm sm:text-base text-gray-300">{date}</span>
+    </div>
+    <div className="flex items-center col-span-2 sm:col-span-1">
+      <span className="text-sm sm:text-base text-white font-medium truncate">{merchant}</span>
     </div>
     <div className="flex items-center">
-      <span className="text-white font-medium">{merchant}</span>
+      <span className="text-sm sm:text-base text-white font-semibold">₹{amount.toFixed(2)}</span>
     </div>
     <div className="flex items-center">
-      <span className="text-white font-semibold">₹{amount.toFixed(2)}</span>
-    </div>
-    <div className="flex items-center">
-      <span className={`px-3 py-1 rounded-full text-sm font-medium ${categoryColor}`}>
+      <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${categoryColor} truncate`}>
         {category}
       </span>
     </div>
@@ -296,64 +296,65 @@ export default function Dashboard({ user, expenses = [] }) {
   return (
     <div>
       <nav className="border-b border-gray-800 backdrop-blur-xl sticky top-0 z-[50]">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex mt-[2vh] items-center justify-between">
-          <h1 className="text-2xl font-bold text-white">Dashboard</h1>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex mt-[2vh] items-center justify-between">
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Dashboard</h1>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsAddExpenseOpen(true)}
-            className="bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-colors shadow-lg shadow-emerald-500/20"
+            className="bg-emerald-500 cursor-pointer hover:bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold flex items-center gap-2 transition-colors shadow-lg shadow-emerald-500/20 text-sm sm:text-base"
           >
-            <Plus className="w-5 h-5 cursor-pointer" />
-            Add Expense
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" />
+            {/* <span className="hidden xs:inline">Add Expense</span> */}
+            Add expense
           </motion.button>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h2 className="text-4xl font-bold text-white mb-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
             Welcome back {user?.name || ""}!
           </h2>
-          <p className="text-gray-400 text-lg">Here&apos;s a summary of your spending this month</p>
+          <p className="text-gray-400 text-base sm:text-lg">Here&apos;s a summary of your spending this month</p>
         </motion.div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="lg:col-span-1"
           >
-            <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-6 shadow-2xl shadow-emerald-500/20 border border-emerald-400/20">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-white/90 font-medium">Total Spending</h3>
-                <DollarSign className="w-6 h-6 text-white/80" />
+            <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl p-5 sm:p-6 shadow-2xl shadow-emerald-500/20 border border-emerald-400/20">
+              <div className="flex items-center justify-between mb-3 sm:mb-4">
+                <h3 className="text-white/90 font-medium text-sm sm:text-base">Total Spending</h3>
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-white/80" />
               </div>
-              <p className="text-5xl font-bold text-white mb-4">
+              <p className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4">
                 ₹{stats.totalSpending.toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2
                 })}
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <div className={`flex items-center gap-1 px-2 py-1 rounded-full ${stats.monthlyChange >= 0 ? 'bg-red-500/20' : 'bg-green-500/20'
                   }`}>
                   {stats.monthlyChange >= 0 ? (
-                    <TrendingUp className="w-4 h-4 text-red-200" />
+                    <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-red-200" />
                   ) : (
-                    <TrendingDown className="w-4 h-4 text-green-200" />
+                    <TrendingDown className="w-3 h-3 sm:w-4 sm:h-4 text-green-200" />
                   )}
-                  <span className={`text-sm font-semibold ${stats.monthlyChange >= 0 ? 'text-red-200' : 'text-green-200'
+                  <span className={`text-xs sm:text-sm font-semibold ${stats.monthlyChange >= 0 ? 'text-red-200' : 'text-green-200'
                     }`}>
                     {Math.abs(stats.monthlyChange)}%
                   </span>
                 </div>
-                <span className="text-white/70 text-sm">from last month</span>
+                <span className="text-white/70 text-xs sm:text-sm">from last month</span>
               </div>
             </div>
           </motion.div>
@@ -364,14 +365,14 @@ export default function Dashboard({ user, expenses = [] }) {
             transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-6 h-full">
-              <h3 className="text-xl font-semibold text-white mb-6">Spending by Category</h3>
-              <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-around gap-8">
+            <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-4 sm:p-6 h-full">
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Spending by Category</h3>
+              <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-around gap-6 sm:gap-8">
                 <PieChart data={stats.categoryBreakdown} total={stats.totalSpending} />
 
-                <div className={`${stats.categoryBreakdown.length > 5
-                  ? 'grid grid-cols-2 gap-x-8 gap-y-3'
-                  : 'space-y-3'
+                <div className={`w-full lg:w-auto ${stats.categoryBreakdown.length > 5
+                  ? 'grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-2 sm:gap-y-3'
+                  : 'space-y-2 sm:space-y-3'
                   }`}>
                   {stats.categoryBreakdown.map((item, index) => (
                     <motion.div
@@ -379,15 +380,15 @@ export default function Dashboard({ user, expenses = [] }) {
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 + index * 0.1 }}
-                      className="flex items-center gap-3 hover:bg-gray-800/30 p-2 rounded-lg transition-colors cursor-pointer"
+                      className="flex items-center gap-2 sm:gap-3 hover:bg-gray-800/30 p-2 rounded-lg transition-colors cursor-pointer"
                     >
                       <div
-                        className="w-4 h-4 rounded-full flex-shrink-0"
+                        className="w-3 h-3 sm:w-4 sm:h-4 rounded-full flex-shrink-0"
                         style={{ backgroundColor: item.color }}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-md font-medium text-white">{item.category}</p>
-                        <p className="text-sm text-gray-400">
+                        <p className="text-sm sm:text-md font-medium text-white truncate">{item.category}</p>
+                        <p className="text-xs sm:text-sm text-gray-400">
                           ₹{item.amount.toFixed(2)} ({((item.amount / stats.totalSpending) * 100).toFixed(1)}%)
                         </p>
                       </div>
@@ -405,10 +406,10 @@ export default function Dashboard({ user, expenses = [] }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
-          <h3 className="text-xl font-semibold text-white mb-4">Expense Types</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <h3 className="text-lg sm:text-xl font-semibold text-white mb-3 sm:mb-4">Expense Types</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {Object.entries(categoryConfig).map(([category, config], index) => {
               const categoryAmount = stats.categoryBreakdown.find(c => c.category === category)?.amount || 0;
               return (
@@ -435,9 +436,9 @@ export default function Dashboard({ user, expenses = [] }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
         >
-          <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-semibold text-white">All Expenses</h3>
+          <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 flex-wrap gap-3">
+              <h3 className="text-lg sm:text-xl font-semibold text-white">All Expenses</h3>
 
               {expenses.length > 0 && (
                 <ExpenseCalendar
@@ -449,9 +450,9 @@ export default function Dashboard({ user, expenses = [] }) {
             </div>
 
             {expenses.length === 0 ? (
-              <p className="text-center text-gray-400 py-8">No expenses yet. Add your first expense!</p>
+              <p className="text-center text-gray-400 py-6 sm:py-8 text-sm sm:text-base">No expenses yet. Add your first expense!</p>
             ) : (
-              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-gray-600">
+              <div className="space-y-2 sm:space-y-3 max-h-[450px] overflow-y-auto pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-700 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-gray-600">
                 {expenses.map((expense, index) => (
                   <motion.div
                     key={expense.id}

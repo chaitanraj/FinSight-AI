@@ -1,152 +1,74 @@
 import { NextResponse } from "next/server";
 
-const MODEL_NAME = "gemini-2.5-flash-preview-09-2025";
+const MODEL_NAME = "gemini-2.5-flash-lite"; 
 const API_KEY = process.env.GOOGLE_API_KEY;
-
-if (!API_KEY) {
-  throw new Error("Missing GOOGLE_API_KEY in env");
-}
-
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
+const API_URL = `https://generativelanguage.googleapis.com/v1/models/${MODEL_NAME}:generateContent?key=${API_KEY}`;
 
 const ALLOWED_CATEGORIES = [
-  "Groceries",
-  "Food",
-  "Transport",
-  "Shopping",
-  "Utilities",
-  "Rent",
-  "Entertainment",
-  "Health",
-  "Travel",
-  "Other"
+  "Groceries", "Food", "Transport", "Shopping", "Utilities", 
+  "Rent", "Entertainment", "Health", "Travel", "Other"
 ];
 
-export async function POST(req) {
-  const { text } = await req.json();
+function fallbackCategorize(text) {
+  const input = text.toLowerCase();
+  
+  const rules = [
+    { cat: "Groceries", keywords: ["mart", "market", "basket", "grocer", "dairy", "lentils", "pulse", "bigbasket", "zepto", "blinkit", "milk"] },
+    { cat: "Food", keywords: ["restaurant", "cafe", "swiggy", "zomato", "eats", "pizza", "burger", "dine", "starbucks", "coffee"] },
+    { cat: "Transport", keywords: ["uber", "ola", "taxi", "cab", "metro", "fuel", "petrol", "diesel", "shell", "hpcl", "train", "bus"] },
+    { cat: "Shopping", keywords: ["zara", "amazon", "flipkart", "myntra", "mall", "fashion", "wear", "clothing", "shoes", "nike", "h&m"] },
+    { cat: "Utilities", keywords: ["bill", "electricity", "water", "gas", "internet", "wifi", "jio", "airtel", "recharge", "mobile"] },
+    { cat: "Rent", keywords: ["rent", "owner", "apartment", "deposit"] },
+    { cat: "Entertainment", keywords: ["netflix", "prime", "spotify", "movie", "cinema", "theatre", "hotstar", "concert", "game"] },
+    { cat: "Health", keywords: ["pharmacy", "hospital", "clinic", "doctor", "medical", "chemist", "fitness", "gym", "med"] },
+    { cat: "Travel", keywords: ["hotel", "flight", "air", "booking", "makemytrip", "goibibo", "stay", "resort"] }
+  ];
 
-  if (!text) {
-    return NextResponse.json({ error: "text required" }, { status: 400 });
+  for (const rule of rules) {
+    if (rule.keywords.some(k => input.includes(k))) return rule.cat;
   }
-
-  const cleaned = text
-    .toLowerCase()
-    .replace(/[^\w\s]/g, "")
-    .replace(/[0-9]/g, "")
-    .trim();
-
-  const systemPrompt = `
-You are an expert financial transaction classifier.  
-Your job is to choose EXACTLY ONE best-fitting category from this list:
-${ALLOWED_CATEGORIES.join(", ")}
-
-Rules:
-- ALWAYS choose the closest matching category.
-- NEVER output anything except the category name.
-- If unsure, choose the most likely category, NOT "Other".
-
-Examples:
-"starbucks coffee" → Food
-"uber ride airport" → Transport
-"ola cab" → Transport
-"zara fashion shopping" → Shopping
-"big bazaar grocery run" → Groceries
-"walmart groceries" → Groceries
-"amazon shopping order" → Shopping
-"electricity bill" → Utilities
-"doctor consultation" → Health
-"gym membership" → Health
-"netflix subscription" → Entertainment
-"flight ticket mumbai" → Travel
-"monthly rent payment" → Rent
-`;
-
-  const userQuery = `
-Classify this merchant:
-"${cleaned}"
-
-Return ONLY the category name.
-`;
-
-  const payload = {
-    contents: [{ parts: [{ text: userQuery }] }],
-    systemInstruction: { parts: [{ text: systemPrompt }] },
-    generationConfig: {
-      maxOutputTokens: 5,
-      temperature: 0.0,
-    },
-  };
-
-  try {
-   
-    let response;
-    for (let attempt = 0; attempt < 3; attempt++) {
-      response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (response.ok) break;
-      await new Promise((res) =>
-        setTimeout(res, (2 ** attempt) * 400)
-      );
-    }
-
-    if (!response.ok) throw new Error("Gemini failed");
-
-    const result = await response.json();
-
-    let generated =
-      result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-
-    generated = generated.trim();
-
-    
-    generated =
-      generated.charAt(0).toUpperCase() +
-      generated.slice(1).toLowerCase();
-
-   
-    const fallback = detectCategoryFallback(cleaned);
-
-    const finalCategory =
-      ALLOWED_CATEGORIES.includes(generated)
-        ? generated
-        : fallback;
-
-    return NextResponse.json({ category: finalCategory });
-
-  } catch (err) {
-    console.error("Category-Gueser API Error:", err);
-    return NextResponse.json({ category: "Other" }, { status: 500 });
-  }
+  return "Other";
 }
 
-function detectCategoryFallback(text) {
-  if (text.includes("uber") || text.includes("ola") || text.includes("cab"))
-    return "Transport";
+export async function POST(req) {
+  try {
+    const { text } = await req.json();
+    if (!text) return NextResponse.json({ error: "Text required" }, { status: 400 });
 
-  if (text.includes("flight") || text.includes("air") || text.includes("airport"))
-    return "Travel";
+    const cleaned = text.toLowerCase().trim();
 
-  if (text.includes("doctor") || text.includes("hospital") || text.includes("clinic"))
-    return "Health";
+    const payload = {
+      contents: [{
+        parts: [{ 
+          text: `Classify: "${cleaned}". Use ONLY: ${ALLOWED_CATEGORIES.join(", ")}. Reply with one word.` 
+        }]
+      }],
+      generationConfig: { temperature: 0, maxOutputTokens: 10 }
+    };
 
-  if (text.includes("rent"))
-    return "Rent";
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-  if (text.includes("grocery") || text.includes("market") || text.includes("bazaar"))
-    return "Groceries";
+    if (!response.ok) {
+      return NextResponse.json({ category: fallbackCategorize(cleaned), method: "fallback" });
+    }
 
-  if (text.includes("coffee") || text.includes("restaurant") || text.includes("food"))
-    return "Food";
+    const result = await response.json();
+    let generated = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+    
+    const formatted = generated.charAt(0).toUpperCase() + generated.slice(1).toLowerCase().replace(/[^\w]/g, "");
+    const finalCategory = ALLOWED_CATEGORIES.includes(formatted) ? formatted : "Other";
 
-  if (text.includes("bill") || text.includes("electric") || text.includes("water"))
-    return "Utilities";
+    return NextResponse.json({ category: finalCategory, method: "ai" });
 
-  if (text.includes("shop") || text.includes("store") || text.includes("mall"))
-    return "Shopping";
-
-  return "Other";
+  } catch (err) {
+    const { text } = await req.json().catch(() => ({})); 
+    return NextResponse.json({ 
+      category: text ? fallbackCategorize(text) : "Other", 
+      method: "critical-fallback" 
+    });
+  }
 }
