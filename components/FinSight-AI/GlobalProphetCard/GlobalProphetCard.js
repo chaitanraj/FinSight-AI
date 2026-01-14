@@ -100,7 +100,7 @@ const GlobalProphetCard = ({ onInsight }) => {
         predicted = Math.round(predicted);
         trend_per = Math.round(trend_per);
 
-        // Determine if spending is increasing or decreasing
+        
         const isDecreasing = predicted < last_month_actual;
         const isIncreasing = predicted > last_month_actual;
 
