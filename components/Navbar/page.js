@@ -115,7 +115,7 @@ const Page = () => {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 cursor-pointer z-50"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 cursor-pointer z-52"
                   >
                     <span>{user.name}</span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
