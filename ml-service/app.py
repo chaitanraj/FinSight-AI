@@ -16,7 +16,7 @@ app = Flask(__name__)
 # Configure CORS properly
 CORS(app, resources={
     r"/*": {
-        "origins": ["*"],  # In production, replace with your Vercel domain
+        "origins": ["https://usefinsightai.vercel.app/"],  
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
