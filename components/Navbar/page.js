@@ -56,7 +56,7 @@ const Page = () => {
 
   return (
     <div>
-      <div className='flex justify-center relative z-[09]'>
+      <div className='flex justify-center relative z-[50]'>
         <div className='border-b text-md font-normal border-emerald-700/30 bg-zinc-800/60 backdrop-blur-sm mt-[5vh] h-[8vh] w-[95vw] max-w-[150vh] rounded-3xl shadow-lg shadow-emerald-500/5 transition-all duration-300 hover:shadow-emerald-500/10'>
           <div className="flex items-center h-full justify-between text-white px-4 sm:px-6">
             {/* Logo */}
@@ -115,14 +115,14 @@ const Page = () => {
                 <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 cursor-pointer z-52"
+                    className="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-emerald-700 rounded-xl font-medium transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/50 hover:scale-105 cursor-pointer z-[60]"
                   >
                     <span>{user.name}</span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden ">
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 overflow-hidden z-[60]">
                       <Link href="/Dashboard"
                         onClick={() => {
                           setIsDropdownOpen(false);

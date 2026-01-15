@@ -295,7 +295,7 @@ export default function Dashboard({ user, expenses = [] }) {
 
   return (
     <div>
-      <nav className="border-b border-gray-800 backdrop-blur-xl sticky top-0 z-[50]">
+      <nav className="border-b border-gray-800 backdrop-blur-xl sticky top-0 z-[45]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex mt-[2vh] items-center justify-between">
           <h1 className="text-xl sm:text-2xl font-bold text-white">Dashboard</h1>
           <motion.button
