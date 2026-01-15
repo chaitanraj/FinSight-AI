@@ -6,3 +6,5 @@ python-dateutil
 prophet
 ujson
 flask-cors
+scikit-learn
+plotly
