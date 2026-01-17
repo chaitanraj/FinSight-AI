@@ -1,20 +1,59 @@
 "use client";
 import { Github, Apple } from 'lucide-react';
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import { toast } from "react-toastify";
 import { AuthContext } from '@/context/AuthContext';
 
 function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const router = useRouter();
     const { login } = useContext(AuthContext);
+    const { data: session, status } = useSession();
+
+    // Handle Google OAuth callback
+    useEffect(() => {
+        const handleGoogleCallback = async () => {
+            if (status === "authenticated" && session?.user?.email && isGoogleLoading) {
+                try {
+                    const backendRes = await fetch("/api/login/google", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({
+                            email: session.user.email,
+                            name: session.user.name,
+                        }),
+                    });
+
+                    const data = await backendRes.json();
+                    
+                    if (!backendRes.ok) {
+                        toast.error(data?.message || "Backend Google login failed");
+                        setIsGoogleLoading(false);
+                        return;
+                    }
+
+                    login(data.user);
+                    toast.success(`Welcome ${data.user.name}`);
+                    router.push("/");
+                } catch (err) {
+                    console.error("Google backend error:", err);
+                    toast.error("Google login error");
+                    setIsGoogleLoading(false);
+                }
+            }
+        };
+
+        handleGoogleCallback();
+    }, [status, session, isGoogleLoading]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,7 +61,7 @@ function LoginPage() {
             toast.warn("Please fill in all fields");
             return;
         }
-        // setLoading(true);
+        
         try {
             const res = await fetch(`/api/login`, {
                 method: "POST",
@@ -38,7 +77,6 @@ function LoginPage() {
                 console.log("Name: ", data.user.name)
                 login(data.user);
                 toast.success(`Welcome ${data.user.name}`);
-
                 router.push("/");
             } else {
                 toast.error(data?.message || "Login failed");
@@ -51,47 +89,17 @@ function LoginPage() {
 
     const handleGoogleLogin = async () => {
         try {
-            const res = await signIn("google", {
+            setIsGoogleLoading(true);
+            await signIn("google", {
+                callbackUrl: "/",
                 redirect: false,
-                callbackUrl: "/"
-            })
-            if (res?.error)
-            {
-                toast.error("Google login failed")
-                return
-            }
-            if (res?.ok) {
-                const { getSession } = await import("next-auth/react")
-                const session = await getSession()
-
-                if (!session?.user?.email) {
-                    toast.error("Could not get Google user")
-                    return
-                }
-                const backendRes = await fetch("/api/login/google", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        email: session.user.email,
-                        name: session.user.name,
-                    }),
-                })
-                const data = await backendRes.json()
-                if (!backendRes.ok) {
-                    toast.error(data?.message || "Backend Google login failed")
-                    return
-                }
-
-                login(data.user)
-                toast.success(`Welcome ${data.user.name}`)
-                router.push("/")
-            }
+            });
         } catch (err) {
-            console.error(err)
-            toast.error("Google login error")
+            console.error("Google sign-in error:", err);
+            toast.error("Google login error");
+            setIsGoogleLoading(false);
         }
-    }
+    };
 
     return (
         <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 py-12">
@@ -116,20 +124,19 @@ function LoginPage() {
                             </div>
 
                             {/* Social Login */}
-                            <div className="space-y-3 mb-6">
-
-                                <button onClick={handleGoogleLogin} className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors cursor-pointer duration-200">
+                            {/* <div className="space-y-3 mb-6">
+                                <button 
+                                    onClick={handleGoogleLogin} 
+                                    disabled={isGoogleLoading}
+                                    className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
                                     <FcGoogle className="w-5 h-5" />
-                                    Continue with Google
+                                    {isGoogleLoading ? "Connecting..." : "Continue with Google"}
                                 </button>
-                                {/* <button className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200">
-                                    <FaApple className="w-5 h-5" />
-                                    Continue with Apple
-                                </button> */}
-                            </div>
+                            </div> */}
 
                             {/* Divider */}
-                            <div className="relative mb-6">
+                            {/* <div className="relative mb-6">
                                 <div className="absolute inset-0 flex items-center">
                                     <div className="w-full border-t border-gray-700"></div>
                                 </div>
@@ -138,7 +145,7 @@ function LoginPage() {
                                         Or continue with email
                                     </span>
                                 </div>
-                            </div>
+                            </div> */}
 
                             {/* Login Form */}
                             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -174,7 +181,7 @@ function LoginPage() {
 
                                 <button
                                     type="submit"
-                                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg shadow-emerald-500/20 mt-6 transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer"
+                                    className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg shadow-emerald-500/20 mt-6 transition-transform duration-200 hover:scale-105 active:scale-95"
                                 >
                                     Login
                                 </button>
@@ -192,7 +199,7 @@ function LoginPage() {
                         </div>
                     </motion.div>
 
-                    {/* Right Aligned - Vector Illustration */}
+                    {/* Right Side - Illustration (keeping your existing SVG) */}
                     <motion.div
                         className="hidden lg:flex items-center justify-center"
                         initial={{ opacity: 0, x: 50 }}
@@ -200,12 +207,8 @@ function LoginPage() {
                         transition={{ duration: 0.6, ease: "easeOut" }}
                     >
                         <div className="relative w-full max-w-md h-full min-h-96 flex items-center justify-center">
-                            {/* Background decorative elements */}
                             <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-emerald-900/20 rounded-3xl blur-3xl"></div>
-
-                            {/* Illustration Container */}
                             <div className="relative z-10">
-                                {/* Floating Card 1 - Lock/Security */}
                                 <motion.div
                                     className="absolute top-8 left-0 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-xl p-4 shadow-2xl w-36 h-28 flex items-center justify-center"
                                     initial={{ opacity: 0, y: -20 }}
@@ -219,7 +222,6 @@ function LoginPage() {
                                     </div>
                                 </motion.div>
 
-                                {/* Floating Card 2 - Verified */}
                                 <motion.div
                                     className="absolute bottom-12 right-0 bg-gradient-to-br from-gray-700 to-gray-800 border border-gray-600 rounded-xl p-4 shadow-2xl w-32 h-24 flex items-center justify-center"
                                     initial={{ opacity: 0, y: 20 }}
@@ -233,7 +235,6 @@ function LoginPage() {
                                     </div>
                                 </motion.div>
 
-                                {/* Main SVG Illustration - Key/Access */}
                                 <motion.svg
                                     className="w-full max-w-xs mx-auto relative z-20"
                                     viewBox="0 0 300 400"
@@ -243,127 +244,32 @@ function LoginPage() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     transition={{ duration: 0.6, delay: 0.2 }}
                                 >
-                                    {/* Door/Portal */}
-                                    <rect
-                                        x="80"
-                                        y="100"
-                                        width="140"
-                                        height="180"
-                                        fill="none"
-                                        stroke="#10b981"
-                                        strokeWidth="2"
-                                        opacity="0.6"
-                                        rx="8"
-                                    />
-
-                                    {/* Door handle (key hole) */}
-                                    <circle
-                                        cx="210"
-                                        cy="185"
-                                        r="6"
-                                        fill="none"
-                                        stroke="#10b981"
-                                        strokeWidth="2"
-                                        opacity="0.5"
-                                    />
-
-                                    {/* Key */}
+                                    <rect x="80" y="100" width="140" height="180" fill="none" stroke="#10b981" strokeWidth="2" opacity="0.6" rx="8" />
+                                    <circle cx="210" cy="185" r="6" fill="none" stroke="#10b981" strokeWidth="2" opacity="0.5" />
                                     <g transform="translate(120, 200)">
-                                        {/* Key head */}
                                         <circle cx="0" cy="0" r="12" fill="#10b981" opacity="0.7" />
-                                        {/* Key shaft */}
-                                        <rect
-                                            x="10"
-                                            y="-4"
-                                            width="35"
-                                            height="8"
-                                            fill="#10b981"
-                                            opacity="0.6"
-                                            rx="2"
-                                        />
-                                        {/* Key teeth */}
-                                        <rect
-                                            x="42"
-                                            y="-2"
-                                            width="4"
-                                            height="4"
-                                            fill="#10b981"
-                                            opacity="0.5"
-                                        />
-                                        <rect
-                                            x="48"
-                                            y="-2"
-                                            width="4"
-                                            height="4"
-                                            fill="#10b981"
-                                            opacity="0.5"
-                                        />
+                                        <rect x="10" y="-4" width="35" height="8" fill="#10b981" opacity="0.6" rx="2" />
+                                        <rect x="42" y="-2" width="4" height="4" fill="#10b981" opacity="0.5" />
+                                        <rect x="48" y="-2" width="4" height="4" fill="#10b981" opacity="0.5" />
                                     </g>
-
-                                    {/* Lock body */}
                                     <g transform="translate(150, 80)">
-                                        <rect
-                                            x="-8"
-                                            y="0"
-                                            width="16"
-                                            height="24"
-                                            fill="none"
-                                            stroke="#10b981"
-                                            strokeWidth="2"
-                                            opacity="0.6"
-                                            rx="2"
-                                        />
-                                        {/* Lock shackle */}
-                                        <path
-                                            d="M -6 0 Q -6 -12 0 -12 Q 6 -12 6 0"
-                                            fill="none"
-                                            stroke="#10b981"
-                                            strokeWidth="2"
-                                            opacity="0.5"
-                                        />
+                                        <rect x="-8" y="0" width="16" height="24" fill="none" stroke="#10b981" strokeWidth="2" opacity="0.6" rx="2" />
+                                        <path d="M -6 0 Q -6 -12 0 -12 Q 6 -12 6 0" fill="none" stroke="#10b981" strokeWidth="2" opacity="0.5" />
                                     </g>
-
-                                    {/* Connecting lines */}
-                                    <line
-                                        x1="60"
-                                        y1="200"
-                                        x2="90"
-                                        y2="200"
-                                        stroke="#10b981"
-                                        strokeWidth="1.5"
-                                        opacity="0.4"
-                                        strokeDasharray="4,4"
-                                    />
-
-                                    {/* Security dots */}
+                                    <line x1="60" y1="200" x2="90" y2="200" stroke="#10b981" strokeWidth="1.5" opacity="0.4" strokeDasharray="4,4" />
                                     <circle cx="50" cy="150" r="4" fill="#10b981" opacity="0.4" />
                                     <circle cx="240" cy="140" r="4" fill="#10b981" opacity="0.3" />
                                     <circle cx="60" cy="300" r="3" fill="#10b981" opacity="0.35" />
                                     <circle cx="230" cy="280" r="3" fill="#10b981" opacity="0.3" />
-
-                                    {/* Verification checkmarks */}
                                     <g transform="translate(100, 320)">
-                                        <path
-                                            d="M 0 0 L 4 4 L 10 -4"
-                                            stroke="#10b981"
-                                            strokeWidth="1.5"
-                                            fill="none"
-                                            opacity="0.4"
-                                        />
+                                        <path d="M 0 0 L 4 4 L 10 -4" stroke="#10b981" strokeWidth="1.5" fill="none" opacity="0.4" />
                                     </g>
                                     <g transform="translate(170, 320)">
-                                        <path
-                                            d="M 0 0 L 4 4 L 10 -4"
-                                            stroke="#10b981"
-                                            strokeWidth="1.5"
-                                            fill="none"
-                                            opacity="0.4"
-                                        />
+                                        <path d="M 0 0 L 4 4 L 10 -4" stroke="#10b981" strokeWidth="1.5" fill="none" opacity="0.4" />
                                     </g>
                                 </motion.svg>
                             </div>
 
-                            {/* Floating Card 3 - Status */}
                             <motion.div
                                 className="absolute bottom-0 left-8 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 border border-emerald-500/30 rounded-lg p-3 shadow-xl backdrop-blur-sm"
                                 initial={{ opacity: 0, scale: 0.8 }}

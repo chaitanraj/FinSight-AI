@@ -8,6 +8,27 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Allows callback URLs on the same origin
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
+    },
+    async session({ session, token }) {
+      // Add user ID to session if needed
+      if (token) {
+        session.user.id = token.sub
+      }
+      return session
+    },
+  },
+  pages: {
+    signIn: '/Login',  // Your custom login page
+    error: '/login',   // Redirect to login on error
+  },
+  secret: process.env.NEXTAUTH_SECRET,
 })
 
 export { handler as GET, handler as POST }

@@ -68,19 +68,19 @@ function SignupPage() {
               </div>
 
               {/* Social Login Buttons */}
-              <div className="space-y-3 mb-6">
+              {/* <div className="space-y-3 mb-6">
                 <button className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200">
                   <FcGoogle className="w-5 h-5" />
                   Continue with Google
-                </button>
+                </button> */}
                 {/* <button className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200">
                   <FaApple className="w-5 h-5" />
                   Continue with Apple
                 </button> */}
-              </div>
+              {/* </div> */}
 
               {/* Divider */}
-              <div className="relative mb-6">
+              {/* <div className="relative mb-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-700"></div>
                 </div>
@@ -89,7 +89,7 @@ function SignupPage() {
                     Or continue with email
                   </span>
                 </div>
-              </div>
+              </div> */}
 
               {/* Signup Form */}
               <form className="space-y-4" onSubmit={handleSubmit}>

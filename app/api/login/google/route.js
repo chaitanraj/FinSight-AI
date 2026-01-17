@@ -14,7 +14,7 @@ export async function POST(req) {
         })
         if (!user) {
             user = await prisma.user.create({
-                data: {       // ✅ add this
+                data: {       
                     email,
                     name,
                     provider: "google",
