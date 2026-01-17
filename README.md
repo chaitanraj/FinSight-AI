@@ -1,3 +1,13 @@
+**FinSight AI** is an AI-powered financial intelligence platform that transforms raw expense data into meaningful insights.
+It automatically categorizes spending using **Generative AI**, visualizing patterns through clean **charts and dashboards**.
+Time-series forecasting with the **Prophet model** predicts future expenses at both global and category levels.
+An **Isolation Forest model** detects unusual or anomalous spending behavior in real time.
+Interactive **pie charts and monthly breakdowns** help users understand where their money goes.
+AI-driven insights highlight trends, overspending risks, and upcoming expense changes.
+The system combines **predictive, generative, and analytical AI** for deeper financial understanding.
+Built with a modern full-stack architecture for scalability and performance.
+Designed to be intuitive, transparent, and explainable.
+FinSight AI turns everyday expenses into actionable financial intelligence.
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
