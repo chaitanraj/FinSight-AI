@@ -102,8 +102,74 @@ function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 py-12">
-            <div className="w-full max-w-6xl">
+        <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 py-12 relative overflow-hidden">
+            {/* Mobile Background */}
+            <div className="lg:hidden absolute inset-0 pointer-events-none">
+                {/* Gradient Orbs */}
+                <div className="absolute top-20 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-20 right-0 w-64 h-64 bg-emerald-600/10 rounded-full blur-3xl"></div>
+                
+                {/* Floating Icons */}
+                <motion.div
+                    className="absolute top-24 right-8 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-xl p-3 backdrop-blur-sm border border-emerald-500/20"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                    <div className="text-2xl">🔒</div>
+                </motion.div>
+
+                <motion.div
+                    className="absolute top-40 left-8 bg-gradient-to-br from-gray-700/40 to-gray-800/40 rounded-xl p-3 backdrop-blur-sm border border-gray-600/30"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                >
+                    <div className="text-emerald-400 text-xl">✓</div>
+                </motion.div>
+
+                <motion.div
+                    className="absolute bottom-32 left-12 bg-emerald-500/10 rounded-lg p-2 backdrop-blur-sm border border-emerald-500/20"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.6 }}
+                >
+                    <div className="flex items-center gap-1">
+                        <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+                        <span className="text-[10px] text-emerald-300">Secure</span>
+                    </div>
+                </motion.div>
+
+                {/* Decorative Circles */}
+                <motion.div
+                    className="absolute top-1/3 right-12 w-3 h-3 bg-emerald-400/30 rounded-full"
+                    animate={{ 
+                        y: [0, -10, 0],
+                        opacity: [0.3, 0.6, 0.3]
+                    }}
+                    transition={{ 
+                        duration: 3,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                    }}
+                ></motion.div>
+
+                <motion.div
+                    className="absolute bottom-1/3 left-16 w-2 h-2 bg-emerald-500/40 rounded-full"
+                    animate={{ 
+                        y: [0, 10, 0],
+                        opacity: [0.4, 0.7, 0.4]
+                    }}
+                    transition={{ 
+                        duration: 4,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                        delay: 1
+                    }}
+                ></motion.div>
+            </div>
+
+            <div className="w-full max-w-6xl relative z-10">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">  
                     {/* Left Side - Form */}
                     <motion.div
@@ -122,8 +188,7 @@ function LoginPage() {
                                     Login to manage your finances
                                 </p>
                             </div>
-
-                            {/* Social Login */}
+                             {/* Social Login */}
                             {/* <div className="space-y-3 mb-6">
                                 <button 
                                     onClick={handleGoogleLogin} 
@@ -148,7 +213,7 @@ function LoginPage() {
                             </div> */}
 
                             {/* Login Form */}
-                            <form className="space-y-4" onSubmit={handleSubmit}>
+                            <div className="space-y-4">
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                                         Email Address
@@ -180,12 +245,12 @@ function LoginPage() {
                                 </div>
 
                                 <button
-                                    type="submit"
+                                    onClick={handleSubmit}
                                     className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg shadow-lg shadow-emerald-500/20 mt-6 transition-transform duration-200 hover:scale-105 active:scale-95"
                                 >
                                     Login
                                 </button>
-                            </form>
+                            </div>
 
                             {/* Signup Link */}
                             <div className="mt-6 text-center">
@@ -199,7 +264,7 @@ function LoginPage() {
                         </div>
                     </motion.div>
 
-                    {/* Right Side - Illustration (keeping your existing SVG) */}
+                    {/* Right Side - Illustration (Desktop only) */}
                     <motion.div
                         className="hidden lg:flex items-center justify-center"
                         initial={{ opacity: 0, x: 50 }}

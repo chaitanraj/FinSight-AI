@@ -51,7 +51,7 @@ export default function Home() {
                   Start Forecasting
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
-                <Link href="/Features" className="cursor-pointer px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white border border-emerald-500/30 rounded-full cursor-pointer font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-200/20 hover:shadow-l hover:scale-105">
+                <Link href="/Features" className="cursor-pointer px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white text-center border border-emerald-500/30 rounded-full cursor-pointer font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-200/20 hover:shadow-l hover:scale-105">
                   See How AI Works
                 </Link>
               </div>

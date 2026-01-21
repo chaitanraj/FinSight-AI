@@ -45,9 +45,109 @@ function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 py-12">
-      <div className="w-full max-w-6xl">
+    <div className="min-h-screen bg-gradient-to-br flex items-center justify-center px-4 py-12 relative overflow-hidden">
+      {/* Mobile Background Decoration */}
+      <div className="lg:hidden absolute inset-0 pointer-events-none">
+        {/* Gradient Orbs */}
+        <div className="absolute top-16 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-16 left-0 w-72 h-72 bg-emerald-600/10 rounded-full blur-3xl"></div>
+        
+        {/* Floating Card - Account Balance */}
+        <motion.div
+          className="absolute top-20 right-6 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-xl p-3 backdrop-blur-sm border border-emerald-500/20 shadow-lg"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <div className="text-center">
+            <div className="text-lg font-bold text-emerald-300">$24k</div>
+            <div className="text-[9px] text-emerald-100">Balance</div>
+          </div>
+        </motion.div>
+
+        {/* Floating Card - Growth */}
+        <motion.div
+          className="absolute top-44 left-6 bg-gradient-to-br from-gray-700/40 to-gray-800/40 rounded-xl p-3 backdrop-blur-sm border border-gray-600/30 shadow-lg"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          <div className="text-center">
+            <div className="text-xl mb-1">📊</div>
+            <div className="text-[10px] font-semibold text-white">Growth</div>
+            <div className="text-[9px] text-emerald-400">+23%</div>
+          </div>
+        </motion.div>
+
+        {/* Floating Badge - Secure */}
+        <motion.div
+          className="absolute bottom-36 right-8 bg-emerald-500/10 rounded-lg p-2 backdrop-blur-sm border border-emerald-500/20"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+        >
+          <div className="flex items-center gap-1">
+            <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+            <span className="text-[10px] text-emerald-300">Verified</span>
+          </div>
+        </motion.div>
+
+        {/* Decorative Circles with Animation */}
+        <motion.div
+          className="absolute top-1/4 right-16 w-3 h-3 bg-emerald-400/30 rounded-full"
+          animate={{ 
+            y: [0, -12, 0],
+            opacity: [0.3, 0.7, 0.3]
+          }}
+          transition={{ 
+            duration: 3.5,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        ></motion.div>
+
+        <motion.div
+          className="absolute bottom-1/4 left-20 w-2.5 h-2.5 bg-emerald-500/40 rounded-full"
+          animate={{ 
+            y: [0, 12, 0],
+            opacity: [0.4, 0.8, 0.4]
+          }}
+          transition={{ 
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1.5
+          }}
+        ></motion.div>
+
+        <motion.div
+          className="absolute top-2/3 right-24 w-2 h-2 bg-emerald-400/35 rounded-full"
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.35, 0.65, 0.35]
+          }}
+          transition={{ 
+            duration: 3,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 0.5
+          }}
+        ></motion.div>
+
+        {/* Shield Icon */}
+        <motion.div
+          className="absolute bottom-1/2 left-8 bg-gradient-to-br from-emerald-500/20 to-emerald-600/10 rounded-lg p-2 backdrop-blur-sm border border-emerald-500/20"
+          initial={{ opacity: 0, rotate: -10 }}
+          animate={{ opacity: 1, rotate: 0 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+        >
+          <div className="text-emerald-400 text-xl">🛡️</div>
+        </motion.div>
+      </div>
+
+      <div className="w-full max-w-6xl relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          
 
           {/* Left Aligned - Form */}
           <motion.div
@@ -72,12 +172,8 @@ function SignupPage() {
                 <button className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200">
                   <FcGoogle className="w-5 h-5" />
                   Continue with Google
-                </button> */}
-                {/* <button className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200">
-                  <FaApple className="w-5 h-5" />
-                  Continue with Apple
-                </button> */}
-              {/* </div> */}
+                </button>
+              </div> */}
 
               {/* Divider */}
               {/* <div className="relative mb-6">
@@ -92,7 +188,7 @@ function SignupPage() {
               </div> */}
 
               {/* Signup Form */}
-              <form className="space-y-4" onSubmit={handleSubmit}>
+              <div className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
                     Full Name
@@ -133,12 +229,12 @@ function SignupPage() {
                   />
                 </div>
                 <button
-                  type="submit"
+                  onClick={handleSubmit}
                   className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-4 rounded-lg transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer shadow-lg shadow-emerald-500/20 mt-6"
                 >
                   Create Account
                 </button>
-              </form>
+              </div>
 
               {/* Terms */}
               <p className="text-xs text-gray-500 text-center mt-4">
@@ -164,7 +260,7 @@ function SignupPage() {
             </div>
           </motion.div>
 
-          {/* Right Side - Illustration */}
+          {/* Right Side - Illustration (Desktop only) */}
           <motion.div
             className="hidden lg:flex items-center justify-center"
             initial={{ opacity: 0, x: 50 }}
