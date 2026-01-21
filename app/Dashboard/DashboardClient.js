@@ -358,37 +358,38 @@ export default function Dashboard({ user, expenses = [] }) {
               </div>
             </div>
           </motion.div>
-
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-4 sm:p-6 h-full">
+            <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-4 sm:p-4 h-full">
               <h3 className="text-lg sm:text-xl font-semibold text-white mb-4 sm:mb-6">Spending by Category</h3>
               <div className="flex flex-col lg:flex-row items-center justify-center lg:justify-around gap-6 sm:gap-8">
-                <PieChart data={stats.categoryBreakdown} total={stats.totalSpending} />
+                <div className="flex-shrink-0">
+                  <PieChart data={stats.categoryBreakdown} total={stats.totalSpending} />
+                </div>
 
-                <div className={`w-full lg:w-auto ${stats.categoryBreakdown.length > 5
-                  ? 'grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-8 gap-y-2 sm:gap-y-3'
-                  : 'space-y-2 sm:space-y-3'
-                  }`}>
+                {/* Category List - Responsive Grid with Auto-fit */}
+                <div className="w-full lg:w-auto grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-x-4 gap-y-3 sm:gap-x-6 sm:gap-y-4 lg:max-w-2xl">
                   {stats.categoryBreakdown.map((item, index) => (
                     <motion.div
                       key={item.category}
                       initial={{ opacity: 0, x: 20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.3 + index * 0.1 }}
-                      className="flex items-center gap-2 sm:gap-3 hover:bg-gray-800/30 p-2 rounded-lg transition-colors cursor-pointer"
+                      className="flex items-center gap-2 sm:gap-3 hover:bg-gray-800/30 p-2 sm:p-3 rounded-lg transition-colors cursor-pointer"
                     >
                       <div
                         className="w-3 h-3 sm:w-4 sm:h-4 rounded-full flex-shrink-0"
                         style={{ backgroundColor: item.color }}
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm sm:text-md font-medium text-white truncate">{item.category}</p>
-                        <p className="text-xs sm:text-sm text-gray-400">
+                        <p className="text-sm sm:text-base font-medium text-white whitespace-nowrap overflow-hidden text-ellipsis">
+                          {item.category}
+                        </p>
+                        <p className="text-xs sm:text-sm text-gray-400 whitespace-nowrap">
                           ₹{item.amount.toFixed(2)} ({((item.amount / stats.totalSpending) * 100).toFixed(1)}%)
                         </p>
                       </div>
@@ -400,7 +401,7 @@ export default function Dashboard({ user, expenses = [] }) {
           </motion.div>
         </div>
 
-      <FinSightAI/>
+        <FinSightAI />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
