@@ -27,8 +27,6 @@ import { useRef } from 'react';
 import { timeZoneHelper } from '@/utils/timeZoneHelper';
 import FinSightAI from '@/components/FinSight-AI/MasterCard/MasterCard';
 
-
-
 const categoryConfig = {
   Groceries: {
     color: "bg-purple-500",

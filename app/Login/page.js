@@ -6,7 +6,7 @@ import { FaApple } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useRef } from 'react';
 import { toast } from "react-toastify";
 import { AuthContext } from '@/context/AuthContext';
 
@@ -14,16 +14,48 @@ function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
+    const hasSynced = useRef(false);
     const router = useRouter();
-    const { login } = useContext(AuthContext);
+    const { login, isLoggedIn } = useContext(AuthContext);
     const { data: session, status } = useSession();
 
-    // Handle Google OAuth callback
+    // Immediately show loading state when returning from Google OAuth
     useEffect(() => {
-        const handleGoogleCallback = async () => {
-            if (status === "authenticated" && session?.user?.email && isGoogleLoading) {
+        if (typeof window !== 'undefined') {
+            const isPending = sessionStorage.getItem('googleLoginPending') === 'true';
+            if (isPending && status === "loading") {
+                setIsSyncing(true);
+            }
+        }
+    }, [status]);
+
+    // Handle Google OAuth callback - sync user with backend
+    useEffect(() => {
+        const syncGoogleUser = async () => {
+            // Check if this is a Google OAuth callback (flag set via sessionStorage)
+            const isGoogleCallback = typeof window !== 'undefined' &&
+                sessionStorage.getItem('googleLoginPending') === 'true';
+
+            // Only sync if:
+            // 1. Session is authenticated (OAuth succeeded)
+            // 2. User is not already logged in via AuthContext
+            // 3. Haven't already synced in this session
+            // 4. googleLoginPending flag is set in sessionStorage
+            if (
+                status === "authenticated" &&
+                session?.user?.email &&
+                !isLoggedIn &&
+                !hasSynced.current &&
+                isGoogleCallback
+            ) {
+                hasSynced.current = true;
+                setIsSyncing(true);
+                // Clear the flag immediately to prevent re-sync
+                sessionStorage.removeItem('googleLoginPending');
+
                 try {
-                    const backendRes = await fetch("/api/login/google", {
+                    const res = await fetch("/api/login/google", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         credentials: "include",
@@ -33,27 +65,29 @@ function LoginPage() {
                         }),
                     });
 
-                    const data = await backendRes.json();
-                    
-                    if (!backendRes.ok) {
-                        toast.error(data?.message || "Backend Google login failed");
-                        setIsGoogleLoading(false);
-                        return;
-                    }
+                    const data = await res.json();
 
-                    login(data.user);
-                    toast.success(`Welcome ${data.user.name}`);
-                    router.push("/");
+                    if (res.ok) {
+                        console.log("Google login synced:", data);
+                        login(data.user);
+                        toast.success(`Welcome ${data.user.name}`);
+                        router.push("/");
+                    } else {
+                        toast.error(data?.error || "Google login failed");
+                        hasSynced.current = false;
+                        setIsSyncing(false);
+                    }
                 } catch (err) {
-                    console.error("Google backend error:", err);
-                    toast.error("Google login error");
-                    setIsGoogleLoading(false);
+                    console.error("Google sync error:", err);
+                    toast.error("Failed to sync Google account");
+                    hasSynced.current = false;
+                    setIsSyncing(false);
                 }
             }
         };
 
-        handleGoogleCallback();
-    }, [status, session, isGoogleLoading]);
+        syncGoogleUser();
+    }, [session, status, login, router, isLoggedIn]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -61,7 +95,7 @@ function LoginPage() {
             toast.warn("Please fill in all fields");
             return;
         }
-        
+
         try {
             const res = await fetch(`/api/login`, {
                 method: "POST",
@@ -90,14 +124,16 @@ function LoginPage() {
     const handleGoogleLogin = async () => {
         try {
             setIsGoogleLoading(true);
+            // Set flag in sessionStorage to persist across OAuth redirect
+            sessionStorage.setItem('googleLoginPending', 'true');
             await signIn("google", {
-                callbackUrl: "/",
-                redirect: false,
+                callbackUrl: "/Login",
             });
         } catch (err) {
             console.error("Google sign-in error:", err);
             toast.error("Google login error");
             setIsGoogleLoading(false);
+            sessionStorage.removeItem('googleLoginPending');
         }
     };
 
@@ -108,7 +144,7 @@ function LoginPage() {
                 {/* Gradient Orbs */}
                 <div className="absolute top-20 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute bottom-20 right-0 w-64 h-64 bg-emerald-600/10 rounded-full blur-3xl"></div>
-                
+
                 {/* Floating Icons */}
                 <motion.div
                     className="absolute top-24 right-8 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-xl p-3 backdrop-blur-sm border border-emerald-500/20"
@@ -143,11 +179,11 @@ function LoginPage() {
                 {/* Decorative Circles */}
                 <motion.div
                     className="absolute top-1/3 right-12 w-3 h-3 bg-emerald-400/30 rounded-full"
-                    animate={{ 
+                    animate={{
                         y: [0, -10, 0],
                         opacity: [0.3, 0.6, 0.3]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 3,
                         repeat: Infinity,
                         ease: "easeInOut"
@@ -156,11 +192,11 @@ function LoginPage() {
 
                 <motion.div
                     className="absolute bottom-1/3 left-16 w-2 h-2 bg-emerald-500/40 rounded-full"
-                    animate={{ 
+                    animate={{
                         y: [0, 10, 0],
                         opacity: [0.4, 0.7, 0.4]
                     }}
-                    transition={{ 
+                    transition={{
                         duration: 4,
                         repeat: Infinity,
                         ease: "easeInOut",
@@ -170,7 +206,7 @@ function LoginPage() {
             </div>
 
             <div className="w-full max-w-6xl relative z-10">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">  
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                     {/* Left Side - Form */}
                     <motion.div
                         className="w-full max-w-md mx-auto lg:mx-0"
@@ -188,20 +224,20 @@ function LoginPage() {
                                     Login to manage your finances
                                 </p>
                             </div>
-                             {/* Social Login */}
-                            {/* <div className="space-y-3 mb-6">
-                                <button 
-                                    onClick={handleGoogleLogin} 
-                                    disabled={isGoogleLoading}
-                                    className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                            {/* Social Login */}
+                            <div className="space-y-3 mb-6">
+                                <button
+                                    onClick={handleGoogleLogin}
+                                    disabled={isGoogleLoading || isSyncing}
+                                    className="w-full cursor-pointer flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <FcGoogle className="w-5 h-5" />
-                                    {isGoogleLoading ? "Connecting..." : "Continue with Google"}
+                                    {isSyncing ? "Signing you in..." : isGoogleLoading ? "Connecting..." : "Continue with Google"}
                                 </button>
-                            </div> */}
+                            </div>
 
                             {/* Divider */}
-                            {/* <div className="relative mb-6">
+                            <div className="relative mb-6">
                                 <div className="absolute inset-0 flex items-center">
                                     <div className="w-full border-t border-gray-700"></div>
                                 </div>
@@ -210,7 +246,7 @@ function LoginPage() {
                                         Or continue with email
                                     </span>
                                 </div>
-                            </div> */}
+                            </div>
 
                             {/* Login Form */}
                             <div className="space-y-4">

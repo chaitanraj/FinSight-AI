@@ -1,34 +1,39 @@
-import NextAuth from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 
 const handler = NextAuth({
-  providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    }),
-  ],
-  callbacks: {
-    async redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url
-      return baseUrl
+    providers: [
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
+    ],
+    callbacks: {
+        async signIn({ user, account, profile }) {
+            // Allow sign in - user creation/sync happens on the frontend
+            // after successful OAuth callback
+            return true;
+        },
+        async jwt({ token, user, account }) {
+            if (account && user) {
+                token.email = user.email;
+                token.name = user.name;
+            }
+            return token;
+        },
+        async session({ session, token }) {
+            if (token) {
+                session.user.email = token.email;
+                session.user.name = token.name;
+            }
+            return session;
+        },
     },
-    async session({ session, token }) {
-      // Add user ID to session if needed
-      if (token) {
-        session.user.id = token.sub
-      }
-      return session
+    pages: {
+        signIn: "/Login",
+        error: "/Login",
     },
-  },
-  pages: {
-    signIn: '/Login',  // Your custom login page
-    error: '/login',   // Redirect to login on error
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-})
+    secret: process.env.NEXTAUTH_SECRET,
+});
 
-export { handler as GET, handler as POST }
+export { handler as GET, handler as POST };
