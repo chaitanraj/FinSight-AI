@@ -2,13 +2,14 @@
 import { Github, Apple } from 'lucide-react';
 import { signIn, useSession } from "next-auth/react"
 import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa";
 import { motion } from 'framer-motion';
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { useContext, useState, useEffect, useRef } from 'react';
 import { toast } from "react-toastify";
 import { AuthContext } from '@/context/AuthContext';
+
+
 
 function LoginPage() {
     const [email, setEmail] = useState("");
@@ -20,7 +21,6 @@ function LoginPage() {
     const { login, isLoggedIn } = useContext(AuthContext);
     const { data: session, status } = useSession();
 
-    // Immediately show loading state when returning from Google OAuth
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const isPending = sessionStorage.getItem('googleLoginPending') === 'true';
@@ -30,18 +30,11 @@ function LoginPage() {
         }
     }, [status]);
 
-    // Handle Google OAuth callback - sync user with backend
     useEffect(() => {
         const syncGoogleUser = async () => {
-            // Check if this is a Google OAuth callback (flag set via sessionStorage)
             const isGoogleCallback = typeof window !== 'undefined' &&
                 sessionStorage.getItem('googleLoginPending') === 'true';
 
-            // Only sync if:
-            // 1. Session is authenticated (OAuth succeeded)
-            // 2. User is not already logged in via AuthContext
-            // 3. Haven't already synced in this session
-            // 4. googleLoginPending flag is set in sessionStorage
             if (
                 status === "authenticated" &&
                 session?.user?.email &&
@@ -51,7 +44,6 @@ function LoginPage() {
             ) {
                 hasSynced.current = true;
                 setIsSyncing(true);
-                // Clear the flag immediately to prevent re-sync
                 sessionStorage.removeItem('googleLoginPending');
 
                 try {

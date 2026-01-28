@@ -83,7 +83,7 @@ const Footer = () => {
                                         { href: "/About", text: "About Us" },
                                         { href: "/Features", text: "Features" },
                                         // { href: "/pricing", text: "Pricing" },
-                                        // { href: "/contact", text: "Contact" },
+                                        { href: "/Contact", text: "Contact" },
                                         { href: "/Privacy", text: "Privacy Policy" },
                                         // { href: "/Terms", text: "Terms of Service" }
                                     ].map((link, index) => (

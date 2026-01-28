@@ -14,7 +14,7 @@ export async function POST(req) {
         })
         if (!user) {
             user = await prisma.user.create({
-                data: {       
+                data: {
                     email,
                     name,
                     provider: "google",
@@ -24,7 +24,7 @@ export async function POST(req) {
 
 
         const token = jwt.sign(
-            { id: user.id, name: user.name },
+            { id: user.id, name: user.name, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: "7d" }
         );

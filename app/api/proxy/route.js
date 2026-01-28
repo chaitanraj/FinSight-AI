@@ -17,6 +17,7 @@ export async function GET(req) {
       loggedIn: true,
       name: payload.name,
       id: payload.id,
+      email: payload.email,
     });
   } catch (err) {
     return Response.json({ loggedIn: false }, { status: 401 });

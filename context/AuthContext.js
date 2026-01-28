@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
       if (res.ok) {
         const data = await res.json();
         if (data.loggedIn) {
-          setUser({ id: data.id, name: data.name });
+          setUser({ id: data.id, name: data.name ,email: data.email });
           setIsLoggedIn(true);
           console.log("✅ User authenticated:", data.name);
           return true;
