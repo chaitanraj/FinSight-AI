@@ -4,15 +4,98 @@ import { FcGoogle } from "react-icons/fc";
 import Link from "next/link";
 import { FaApple } from "react-icons/fa";
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from "react-toastify";
+import { signIn, useSession } from "next-auth/react";
+import { AuthContext } from '@/context/AuthContext';
 
 function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router=useRouter();
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const hasSynced = useRef(false);
+  const router = useRouter();
+  const { login, isLoggedIn } = useContext(AuthContext);
+  const { data: session, status } = useSession();
+
+  // Show loading state when returning from Google OAuth
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const isPending = sessionStorage.getItem('googleSignupPending') === 'true';
+      if (isPending && status === "loading") {
+        setIsSyncing(true);
+      }
+    }
+  }, [status]);
+
+  // Handle Google OAuth callback - sync user with backend
+  useEffect(() => {
+    const syncGoogleUser = async () => {
+      const isGoogleCallback = typeof window !== 'undefined' &&
+        sessionStorage.getItem('googleSignupPending') === 'true';
+
+      if (
+        status === "authenticated" &&
+        session?.user?.email &&
+        !isLoggedIn &&
+        !hasSynced.current &&
+        isGoogleCallback
+      ) {
+        hasSynced.current = true;
+        setIsSyncing(true);
+        sessionStorage.removeItem('googleSignupPending');
+
+        try {
+          const res = await fetch("/api/login/google", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              email: session.user.email,
+              name: session.user.name,
+            }),
+          });
+
+          const data = await res.json();
+
+          if (res.ok) {
+            login(data.user);
+            toast.success(`Welcome ${data.user.name}!`);
+            router.push("/");
+          } else {
+            toast.error(data?.error || "Google signup failed");
+            hasSynced.current = false;
+            setIsSyncing(false);
+          }
+        } catch (err) {
+          console.error("Google sync error:", err);
+          toast.error("Failed to create account with Google");
+          hasSynced.current = false;
+          setIsSyncing(false);
+        }
+      }
+    };
+
+    syncGoogleUser();
+  }, [session, status, login, router, isLoggedIn]);
+
+  const handleGoogleSignup = async () => {
+    try {
+      setIsGoogleLoading(true);
+      sessionStorage.setItem('googleSignupPending', 'true');
+      await signIn("google", {
+        callbackUrl: "/Signup",
+      });
+    } catch (err) {
+      console.error("Google sign-up error:", err);
+      toast.error("Google signup error");
+      setIsGoogleLoading(false);
+      sessionStorage.removeItem('googleSignupPending');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -25,7 +108,7 @@ function SignupPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({name, email, password }),
+        body: JSON.stringify({ name, email, password }),
       });
 
       const data = await res.json();
@@ -51,7 +134,7 @@ function SignupPage() {
         {/* Gradient Orbs */}
         <div className="absolute top-16 right-0 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-16 left-0 w-72 h-72 bg-emerald-600/10 rounded-full blur-3xl"></div>
-        
+
         {/* Floating Card - Account Balance */}
         <motion.div
           className="absolute top-20 right-6 bg-gradient-to-br from-emerald-400/20 to-emerald-600/20 rounded-xl p-3 backdrop-blur-sm border border-emerald-500/20 shadow-lg"
@@ -95,11 +178,11 @@ function SignupPage() {
         {/* Decorative Circles with Animation */}
         <motion.div
           className="absolute top-1/4 right-16 w-3 h-3 bg-emerald-400/30 rounded-full"
-          animate={{ 
+          animate={{
             y: [0, -12, 0],
             opacity: [0.3, 0.7, 0.3]
           }}
-          transition={{ 
+          transition={{
             duration: 3.5,
             repeat: Infinity,
             ease: "easeInOut"
@@ -108,11 +191,11 @@ function SignupPage() {
 
         <motion.div
           className="absolute bottom-1/4 left-20 w-2.5 h-2.5 bg-emerald-500/40 rounded-full"
-          animate={{ 
+          animate={{
             y: [0, 12, 0],
             opacity: [0.4, 0.8, 0.4]
           }}
-          transition={{ 
+          transition={{
             duration: 4,
             repeat: Infinity,
             ease: "easeInOut",
@@ -122,11 +205,11 @@ function SignupPage() {
 
         <motion.div
           className="absolute top-2/3 right-24 w-2 h-2 bg-emerald-400/35 rounded-full"
-          animate={{ 
+          animate={{
             scale: [1, 1.3, 1],
             opacity: [0.35, 0.65, 0.35]
           }}
-          transition={{ 
+          transition={{
             duration: 3,
             repeat: Infinity,
             ease: "easeInOut",
@@ -147,7 +230,7 @@ function SignupPage() {
 
       <div className="w-full max-w-6xl relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          
+
 
           {/* Left Aligned - Form */}
           <motion.div
@@ -168,15 +251,19 @@ function SignupPage() {
               </div>
 
               {/* Social Login Buttons */}
-              {/* <div className="space-y-3 mb-6">
-                <button className="w-full flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200">
+              <div className="space-y-3 mb-6">
+                <button
+                  onClick={handleGoogleSignup}
+                  disabled={isGoogleLoading || isSyncing}
+                  className="w-full cursor-pointer flex items-center justify-center gap-3 bg-gray-900 hover:bg-black text-white font-semibold py-3 px-4 rounded-lg border border-gray-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                   <FcGoogle className="w-5 h-5" />
-                  Continue with Google
+                  {isSyncing ? "Creating account..." : isGoogleLoading ? "Connecting..." : "Continue with Google"}
                 </button>
-              </div> */}
+              </div>
 
               {/* Divider */}
-              {/* <div className="relative mb-6">
+              <div className="relative mb-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-700"></div>
                 </div>
@@ -185,7 +272,7 @@ function SignupPage() {
                     Or continue with email
                   </span>
                 </div>
-              </div> */}
+              </div>
 
               {/* Signup Form */}
               <div className="space-y-4">
