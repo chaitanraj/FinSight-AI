@@ -13,7 +13,7 @@ from rag import get_rag_response
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
-        "origins": ["http://localhost:3000", "https://usefinsightai.vercel.app/"],  
+        "origins": ["http://localhost:3000", "https://usefinsightai.vercel.app"],  
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
