@@ -8,11 +8,12 @@ from predictor import (
 )
 from anomaly import detect_anomaly_model
 import os
+from rag import get_rag_response
 
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
-        "origins": ["https://usefinsightai.vercel.app/"],  
+        "origins": ["http://localhost:3000", "https://usefinsightai.vercel.app/"],  
         "methods": ["GET", "POST", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"]
     }
@@ -86,6 +87,17 @@ def detect_anomaly():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@app.route("/rag/chat", methods=["POST"])
+def rag_chat():
+    data = request.json
+    user_query = data.get("message")
+
+    result = get_rag_response(user_query)
+
+    return jsonify(result)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))

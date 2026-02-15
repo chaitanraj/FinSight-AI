@@ -47,8 +47,8 @@ export default function Home() {
 
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <Link href="/Dashboard" className="group px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 flex cursor-pointer items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
-                  Start Forecasting
+                <Link href="/Chat" className="group px-8 py-4 bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-full font-semibold transition-all duration-300 flex cursor-pointer items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/50 hover:shadow-xl hover:scale-105">
+                  Chat with Fin-AI
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <Link href="/Features" className="cursor-pointer px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white text-center border border-emerald-500/30 rounded-full cursor-pointer font-semibold transition-all duration-300 shadow-md hover:shadow-emerald-200/20 hover:shadow-l hover:scale-105">
