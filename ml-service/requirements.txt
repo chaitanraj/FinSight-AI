@@ -19,10 +19,5 @@ unstructured
 pdfminer.six
 python-dotenv
 
-langchain-huggingface
-sentence-transformers
-transformers
-torch
-huggingface-hub
 google-genai
 
