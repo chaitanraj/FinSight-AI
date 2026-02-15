@@ -12,6 +12,7 @@ plotly
 langchain
 langchain-community
 langchain-google-genai
+langchain-huggingface
 
 chromadb
 pypdf
