@@ -1,8 +1,8 @@
 import os
 import re
 from dotenv import load_dotenv
-from langchain_community.vectorstores import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
+import chromadb
+from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 from groq import Groq
 
 load_dotenv()
@@ -11,13 +11,10 @@ GROQ_API_KEY = (os.getenv("GROQ_API_KEY") or "").strip()
 GROQ_MODEL = (os.getenv("GROQ_MODEL") or "meta-llama/llama-4-scout-17b-16e-instruct").strip()
 CHROMA_DIR = "chroma_db"
 
-embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-
-# Load vector DB
-vectordb = Chroma(
-    persist_directory=CHROMA_DIR,
-    embedding_function=embeddings
-)
+# ONNX-based embeddings (~100MB RAM vs ~500MB+ with PyTorch)
+embedding_fn = DefaultEmbeddingFunction()
+chroma_client = chromadb.PersistentClient(path=CHROMA_DIR)
+collection = chroma_client.get_collection(name="langchain", embedding_function=embedding_fn)
 
 # Groq client
 client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
@@ -124,11 +121,11 @@ def normalize_rewritten_query(raw_text: str, fallback_query: str) -> str:
     return fallback_query
 
 
-def rerank_docs(user_query: str, docs):
+def rerank_docs(user_query: str, documents: list, metadatas: list):
     chunk_text = ""
 
-    for i, doc in enumerate(docs):
-        chunk_text += f"\n\nCHUNK {i+1}:\n{doc.page_content}\n"
+    for i, text in enumerate(documents):
+        chunk_text += f"\n\nCHUNK {i+1}:\n{text}\n"
 
     prompt = f"""
 Select the BEST 3 chunks that directly contain the answer.
@@ -153,15 +150,16 @@ Best Chunk Numbers:
         if part.isdigit():
             indices.append(int(part) - 1)
 
-    reranked = []
+    reranked_docs, reranked_meta = [], []
     for idx in indices:
-        if 0 <= idx < len(docs):
-            reranked.append(docs[idx])
+        if 0 <= idx < len(documents):
+            reranked_docs.append(documents[idx])
+            reranked_meta.append(metadatas[idx])
 
-    if len(reranked) == 0:
-        reranked = docs[:3]
+    if not reranked_docs:
+        return documents[:3], metadatas[:3]
 
-    return reranked[:3]
+    return reranked_docs[:3], reranked_meta[:3]
 
 
 def build_prompt(context: str, user_query: str) -> str:
@@ -249,9 +247,11 @@ def dedupe_sources(sources: list) -> list:
 def get_rag_response(user_query: str):
     rewritten_query = rewrite_query(user_query)
 
-    docs = vectordb.similarity_search(rewritten_query, k=8)
+    results = collection.query(query_texts=[rewritten_query], n_results=8)
+    documents = results.get("documents", [[]])[0]
+    metadatas = results.get("metadatas", [[]])[0]
 
-    if not docs:
+    if not documents:
         # No docs found — answer using general knowledge
         fallback_prompt = build_prompt("No relevant documentation found.", user_query)
         fallback_answer = groq_generate(fallback_prompt)
@@ -266,17 +266,17 @@ def get_rag_response(user_query: str):
             "rewritten_query": rewritten_query
         }
 
-    docs = rerank_docs(user_query, docs)
+    documents, metadatas = rerank_docs(user_query, documents, metadatas)
 
     context_parts = []
     sources = []
 
-    for doc in docs:
-        context_parts.append(doc.page_content)
+    for text, meta in zip(documents, metadatas):
+        context_parts.append(text)
         sources.append({
-            "source": doc.metadata.get("source", "unknown"),
-            "page": doc.metadata.get("page", "unknown"),
-            "title": doc.metadata.get("title", "unknown")
+            "source": (meta or {}).get("source", "unknown"),
+            "page": (meta or {}).get("page", "unknown"),
+            "title": (meta or {}).get("title", "unknown"),
         })
 
     context = "\n\n---\n\n".join(context_parts)

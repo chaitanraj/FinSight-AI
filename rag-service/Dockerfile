@@ -16,4 +16,4 @@ COPY . .
 
 EXPOSE 5001
 
-CMD ["sh", "-c", "gunicorn -b 0.0.0.0:${PORT:-5001} app:app"]
+CMD ["sh", "-c", "gunicorn --preload -w 1 -b 0.0.0.0:${PORT:-5001} app:app"]

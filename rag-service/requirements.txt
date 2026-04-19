@@ -7,14 +7,10 @@ python-dotenv
 # LLM provider
 groq
 
-# RAG / vector store
-langchain
-langchain-community
-langchain-huggingface
-sentence-transformers
+# Vector store (ONNX embeddings — no PyTorch needed)
 chromadb
+onnxruntime
+tokenizers
 
-# PDF ingestion (only needed if re-ingesting docs)
-pypdf
-unstructured
-pdfminer.six
+# PDF ingestion (only needed locally for re-ingesting docs)
+# pip install pypdf langchain langchain-community langchain-text-splitters
