@@ -91,12 +91,20 @@ def detect_anomaly():
 
 @app.route("/rag/chat", methods=["POST"])
 def rag_chat():
-    data = request.json
-    user_query = data.get("message")
+    try:
+        data = request.get_json() or {}
+        user_query = data.get("message")
 
-    result = get_rag_response(user_query)
+        if not user_query or not isinstance(user_query, str):
+            return jsonify({"error": "message_required"}), 400
 
-    return jsonify(result)
+        result = get_rag_response(user_query)
+        return jsonify(result), 200
+
+    except RuntimeError as e:
+        return jsonify({"error": str(e)}), 503
+    except Exception:
+        return jsonify({"error": "rag_service_failed"}), 500
 
 
 if __name__ == "__main__":

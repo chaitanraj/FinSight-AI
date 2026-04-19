@@ -58,6 +58,52 @@ const Chat = () => {
   const fallbackMessage =
     "Sorry, I couldn’t generate a response right now. Please try again.";
 
+  const normalizeAssistantPayload = (data) => {
+    const answer =
+      typeof data?.answer === "string" && data.answer.trim()
+        ? data.answer.trim()
+        : fallbackMessage;
+
+    const summary =
+      typeof data?.summary === "string" ? data.summary.trim() : "";
+
+    const body = typeof data?.body === "string" ? data.body.trim() : "";
+
+    const highlights = Array.isArray(data?.highlights)
+      ? data.highlights
+          .filter((item) => typeof item === "string" && item.trim())
+          .slice(0, 6)
+      : [];
+
+    const sources = Array.isArray(data?.sources) ? data.sources : [];
+
+    return { answer, summary, body, highlights, sources };
+  };
+
+  const splitBodyParagraphs = (body) => {
+    if (!body) return [];
+
+    return body
+      .split(/\n{2,}/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  };
+
+  const renderSourceLabel = (sourceItem) => {
+    const source = sourceItem?.source;
+    const page = sourceItem?.page;
+    const fileName =
+      typeof source === "string" && source !== "unknown"
+        ? source.split("/").pop()
+        : "source";
+
+    if (page && page !== "unknown") {
+      return `${fileName} · p.${page}`;
+    }
+
+    return fileName;
+  };
+
   const handleSend = async (prefilledQuery) => {
     const finalQuery = (prefilledQuery ?? query).trim();
     if (!finalQuery) return;
@@ -76,13 +122,19 @@ const Chat = () => {
 
       const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error(data?.error || "chat_request_failed");
+      }
+
+      const payload = normalizeAssistantPayload(data);
+
       setMessages((prev) => [
         ...prev,
-        { answer: data.answer || fallbackMessage },
+        payload,
       ]);
     } catch (err) {
       console.log(err);
-      setMessages((prev) => [...prev, { answer: fallbackMessage }]);
+      setMessages((prev) => [...prev, { answer: fallbackMessage, summary: "", body: "", highlights: [], sources: [] }]);
     } finally {
       setIsTyping(false);
     }
@@ -162,8 +214,8 @@ const Chat = () => {
 
 
   return (
-    <div className="min-h-screen w-full px-4 py-2 sm:px-6">
-      <div className="mx-auto w-full max-w-4xl">
+    <div className="min-h-screen w-full px-10 py-2 sm:px-10">
+      <div className="mx-auto w-full mt-[3vh] max-w-4xl">
         <button
           onClick={() => router.back()}
           className="group mb-2 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-emerald-900/35 bg-black/45 px-3 py-2 text-sm text-emerald-100 transition-all hover:border-emerald-700/45 hover:bg-slate-900/65 hover:text-emerald-50"
@@ -266,7 +318,60 @@ const Chat = () => {
                       <Bot className="text-emerald-300" size={18} />
                     </div>
                     <div className="max-w-[88%] rounded-xl rounded-tl-sm border border-emerald-900/35 bg-gradient-to-br from-[#0d1513]/90 to-[#0a1110]/80 p-4 shadow-xl md:max-w-[80%]">
-                      <p className="text-sm leading-relaxed text-slate-100/90">{msg.answer}</p>
+                      {msg.summary && (
+                        <p className="mb-2 text-sm font-semibold leading-relaxed text-emerald-100">
+                          {msg.summary}
+                        </p>
+                      )}
+
+                      {msg.body && (
+                        <div className="mb-3 space-y-2.5">
+                          {splitBodyParagraphs(msg.body).map((paragraph, paragraphIdx) => (
+                            <p
+                              key={`${idx}-paragraph-${paragraphIdx}`}
+                              className="text-sm leading-relaxed text-slate-100/90"
+                            >
+                              {paragraph}
+                            </p>
+                          ))}
+                        </div>
+                      )}
+
+                      {!msg.summary && !msg.body && (
+                        <p className="mb-3 text-sm leading-relaxed text-slate-100/90">{msg.answer}</p>
+                      )}
+
+                      {Array.isArray(msg.highlights) && msg.highlights.length > 0 && (
+                        <div className="mb-3 rounded-lg border border-emerald-900/35 bg-black/25 p-3">
+                          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-emerald-200/80">
+                            Key Takeaways
+                          </p>
+                          <ul className="space-y-1.5 text-sm text-slate-200/95">
+                          {msg.highlights.map((point, pointIdx) => (
+                            <li key={`${idx}-point-${pointIdx}`} className="flex items-start gap-2 leading-relaxed">
+                              <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-400/90" />
+                              <span>{point}</span>
+                            </li>
+                          ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* {Array.isArray(msg.sources) && msg.sources.length > 0 && (
+                        <div className="mt-2 border-t border-slate-700/60 pt-2.5">
+                          <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Sources</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {msg.sources.map((sourceItem, srcIdx) => (
+                              <span
+                                key={`${idx}-src-${srcIdx}`}
+                                className="rounded-md border border-emerald-900/45 bg-black/45 px-2 py-1 text-[11px] text-emerald-100/90"
+                              >
+                                {renderSourceLabel(sourceItem)}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )} */}
                     </div>
                   </div>
                 )}

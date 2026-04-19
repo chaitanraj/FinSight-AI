@@ -22,4 +22,5 @@ pdfminer.six
 python-dotenv
 
 google-genai
+groq
 

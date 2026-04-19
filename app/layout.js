@@ -7,6 +7,7 @@ import { ToastContainer } from "react-toastify";
 import { AuthProvider } from "@/context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
 import NextAuthSessionProvider from "./SessionProvider";
+import ChatbotFab from "@/components/ChatbotFab/ChatbotFab";
 import { usePathname } from "next/navigation";
 
 const geistSans = Geist({
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
         <NextAuthSessionProvider>
           <AuthProvider>
             <LayoutContent>{children}</LayoutContent>
+            <ChatbotFab />
             <ToastContainer
               position="top-right"
               autoClose={1000}

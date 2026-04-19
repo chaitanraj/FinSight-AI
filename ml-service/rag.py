@@ -1,12 +1,14 @@
 import os
+import re
 from dotenv import load_dotenv
 from langchain_community.vectorstores import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
-from google import genai
+from groq import Groq
 
 load_dotenv()
 
-GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GROQ_API_KEY = (os.getenv("GROQ_API_KEY") or "").strip()
+GROQ_MODEL = (os.getenv("GROQ_MODEL") or "meta-llama/llama-4-scout-17b-16e-instruct").strip()
 CHROMA_DIR = "chroma_db"
 
 embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
@@ -17,18 +19,60 @@ vectordb = Chroma(
     embedding_function=embeddings
 )
 
-# Gemini client (official)
-client = genai.Client(api_key=GOOGLE_API_KEY)
+# Groq client
+client = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 
-def gemini_generate(prompt: str) -> str:
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
+def groq_generate(prompt: str) -> str:
+    if client is None:
+        raise RuntimeError(
+            "Groq API key is missing. Set GROQ_API_KEY."
+        )
 
-    if response.text:
-        return response.text.strip()
+    # Google AI Studio keys typically start with AIza and are not valid for Groq.
+    if GROQ_API_KEY.startswith("AIza"):
+        raise RuntimeError(
+            "Detected a Google key (AIza) for Groq. Configure GROQ_API_KEY with a valid Groq key."
+        )
+
+    candidate_models = [
+        GROQ_MODEL,
+        "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "llama-3.3-70b-versatile",
+    ]
+
+    seen_models = set()
+    last_exc = None
+
+    for model_name in candidate_models:
+        if not model_name or model_name in seen_models:
+            continue
+        seen_models.add(model_name)
+
+        try:
+            response = client.chat.completions.create(
+                model=model_name,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.2,
+            )
+
+            if response.choices and response.choices[0].message:
+                content = (response.choices[0].message.content or "").strip()
+                if content:
+                    return content
+
+        except Exception as exc:
+            exc_text = str(exc).lower()
+            if "invalid api key" in exc_text or "authentication" in exc_text or "unauthorized" in exc_text:
+                raise RuntimeError(
+                    "Invalid GROQ_API_KEY. Update it with a valid Groq key."
+                ) from exc
+            last_exc = exc
+
+    if last_exc is not None:
+        raise RuntimeError(
+            "Groq request failed. Verify GROQ_MODEL and model access for your Groq account."
+        ) from last_exc
 
     return "I don't know."
 
@@ -44,9 +88,39 @@ Rules:
 
 User Query: {user_query}
 
+Output format:
+- Return only one rewritten search query.
+- No markdown, no bullets, no quotes, no explanation.
+
 Rewritten Query:
 """
-    return gemini_generate(prompt)
+    raw = groq_generate(prompt)
+    return normalize_rewritten_query(raw, user_query)
+
+
+def normalize_rewritten_query(raw_text: str, fallback_query: str) -> str:
+    if not raw_text:
+        return fallback_query
+
+    lines = [line.strip() for line in raw_text.splitlines() if line.strip()]
+    if not lines:
+        return fallback_query
+
+    for line in lines:
+        normalized = re.sub(r"^rewritten query\s*[:\-]\s*", "", line, flags=re.IGNORECASE)
+        normalized = normalized.strip().strip('"').strip("'")
+        lowered = normalized.lower()
+
+        if not normalized:
+            continue
+        if lowered.startswith(("here", "alternatively", "example", "option")):
+            continue
+        if normalized.startswith(("*", "-", "•")):
+            continue
+
+        return normalized
+
+    return fallback_query
 
 
 def rerank_docs(user_query: str, docs):
@@ -70,7 +144,7 @@ Chunks:
 Best Chunk Numbers:
 """
 
-    response = gemini_generate(prompt)
+    response = groq_generate(prompt)
 
     indices = []
     for part in response.split(","):
@@ -102,8 +176,18 @@ PRIORITY RULES:
 STRICT RULES:
 - Do NOT invent FinSight AI features not present in context.
 - If question is about FinSight AI and context doesn't contain it, say you could not find it.
-- Keep responses short, clear, and structured.
-- Use bullet points when helpful.
+- Be concrete and specific, not generic.
+- Explain what the product does, how it works, and why it matters.
+- Mention named features only if they are supported by the context.
+- Prefer 1 short summary sentence, then 1 concise detail paragraph, then 3 to 6 bullet points.
+- Avoid filler phrases like "based on the documentation" unless necessary.
+
+OUTPUT FORMAT:
+- Line 1: a direct one-sentence summary.
+- Then a short paragraph with 2 to 4 sentences.
+- Then bullet points using "- " for concrete capabilities, workflow, or benefits.
+- Do not add markdown headings.
+- Do not add a title.
 
 CONTEXT (FinSight AI Documentation):
 {context}
@@ -115,15 +199,70 @@ FINAL ANSWER:
 """
 
 
+def format_answer_for_ui(answer: str) -> dict:
+    cleaned = (answer or "I don't know.").strip()
+    lines = [line.strip() for line in cleaned.splitlines() if line.strip()]
+
+    highlights = []
+    body_lines = []
+
+    for line in lines:
+        if line.startswith(("* ", "- ", "• ")):
+            highlights.append(line[2:].strip())
+        else:
+            body_lines.append(line)
+
+    summary = body_lines[0] if body_lines else (highlights[0] if highlights else cleaned)
+    body = "\n".join(body_lines[1:]) if len(body_lines) > 1 else ""
+
+    if not highlights and body:
+        sentences = [part.strip() for part in re.split(r"(?<=[.!?])\s+", body) if part.strip()]
+        if len(sentences) > 1:
+            highlights = sentences[:4]
+
+    if not body and highlights:
+        body = " ".join(highlights[:2])
+
+    return {
+        "answer": cleaned,
+        "summary": summary,
+        "body": body,
+        "highlights": highlights[:6],
+    }
+
+
+def dedupe_sources(sources: list) -> list:
+    seen = set()
+    deduped = []
+
+    for src in sources:
+        key = (
+            src.get("source", "unknown"),
+            src.get("page", "unknown"),
+            src.get("title", "unknown"),
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(src)
+
+    return deduped
+
+
 def get_rag_response(user_query: str):
     rewritten_query = rewrite_query(user_query)
 
     docs = vectordb.similarity_search(rewritten_query, k=8)
 
     if not docs:
+        ui_payload = format_answer_for_ui("I don't know based on the provided documentation.")
         return {
-            "answer": "I don't know based on the provided documentation.",
+            "answer": ui_payload["answer"],
+            "summary": ui_payload["summary"],
+            "body": ui_payload["body"],
+            "highlights": ui_payload["highlights"],
             "sources": [],
+            "source_count": 0,
             "rewritten_query": rewritten_query
         }
 
@@ -143,10 +282,16 @@ def get_rag_response(user_query: str):
     context = "\n\n---\n\n".join(context_parts)
 
     prompt = build_prompt(context, user_query)
-    answer = gemini_generate(prompt)
+    answer = groq_generate(prompt)
+    ui_payload = format_answer_for_ui(answer)
+    sources = dedupe_sources(sources)
 
     return {
-        "answer": answer,
+        "answer": ui_payload["answer"],
+        "summary": ui_payload["summary"],
+        "body": ui_payload["body"],
+        "highlights": ui_payload["highlights"],
         "sources": sources,
+        "source_count": len(sources),
         "rewritten_query": rewritten_query
     }
