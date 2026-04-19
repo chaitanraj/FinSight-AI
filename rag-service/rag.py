@@ -81,7 +81,9 @@ def rewrite_query(user_query: str) -> str:
 Rewrite the user query to improve document retrieval.
 
 Rules:
-- Make it more specific and searchable for FinSight AI documentation.
+- Make it more specific and searchable.
+- If the query is about FinSight AI, tailor it for FinSight documentation retrieval.
+- If the query is a general finance question, keep it as a clear finance search query.
 - Do NOT answer the question.
 - Do NOT change meaning.
 
@@ -164,29 +166,25 @@ Best Chunk Numbers:
 
 def build_prompt(context: str, user_query: str) -> str:
     return f"""
-You are FinSight AI Assistant.
+You are FinSight AI Assistant — a helpful financial intelligence chatbot.
 
-PRIORITY RULES:
-1. First priority: Answer using the provided FinSight AI documentation context.
-2. If the answer is not found in the context, then answer using your general finance knowledge.
-3. If you answer using general knowledge, clearly mention:
-   "This is a general finance explanation, not found in FinSight AI documentation."
+You have TWO knowledge sources:
+1. FinSight AI documentation (provided below as CONTEXT).
+2. Your own broad knowledge of personal finance, investing, budgeting, and economics.
 
-STRICT RULES:
+HOW TO ANSWER:
+- If the CONTEXT contains a relevant answer, use it.
+- If the question is a general finance topic (e.g. SIP, RD, mutual funds, budgeting tips, tax), answer confidently using your finance knowledge. Do NOT say "not found in documentation".
+- Only say you cannot help if the question is completely outside finance AND not in context.
 - Do NOT invent FinSight AI features not present in context.
-- If question is about FinSight AI and context doesn't contain it, say you could not find it.
-- Be concrete and specific, not generic.
-- Explain what the product does, how it works, and why it matters.
-- Mention named features only if they are supported by the context.
-- Prefer 1 short summary sentence, then 1 concise detail paragraph, then 3 to 6 bullet points.
-- Avoid filler phrases like "based on the documentation" unless necessary.
+- Be concrete, specific, and helpful. Explain concepts clearly for a beginner.
 
 OUTPUT FORMAT:
-- Line 1: a direct one-sentence summary.
-- Then a short paragraph with 2 to 4 sentences.
-- Then bullet points using "- " for concrete capabilities, workflow, or benefits.
-- Do not add markdown headings.
-- Do not add a title.
+- Line 1: a direct one-sentence summary answering the question.
+- Then a short paragraph with 2 to 4 sentences explaining further.
+- Then 3 to 6 bullet points using "- " for key facts, steps, or benefits.
+- Do not add markdown headings or titles.
+- Do not add disclaimers like "based on documentation" or "this is general knowledge".
 
 CONTEXT (FinSight AI Documentation):
 {context}
@@ -254,7 +252,10 @@ def get_rag_response(user_query: str):
     docs = vectordb.similarity_search(rewritten_query, k=8)
 
     if not docs:
-        ui_payload = format_answer_for_ui("I don't know based on the provided documentation.")
+        # No docs found — answer using general knowledge
+        fallback_prompt = build_prompt("No relevant documentation found.", user_query)
+        fallback_answer = groq_generate(fallback_prompt)
+        ui_payload = format_answer_for_ui(fallback_answer)
         return {
             "answer": ui_payload["answer"],
             "summary": ui_payload["summary"],
