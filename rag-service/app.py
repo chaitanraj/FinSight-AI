@@ -17,6 +17,7 @@ CORS(app, resources={
 
 
 @app.route("/", methods=["GET"])
+@app.route("/health", methods=["GET"])
 def home():
     return jsonify({"message": "RAG Service is running"}), 200
 
