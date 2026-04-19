@@ -1,0 +1,20 @@
+# Web framework
+flask
+gunicorn
+flask-cors
+python-dotenv
+
+# LLM provider
+groq
+
+# RAG / vector store
+langchain
+langchain-community
+langchain-huggingface
+sentence-transformers
+chromadb
+
+# PDF ingestion (only needed if re-ingesting docs)
+pypdf
+unstructured
+pdfminer.six

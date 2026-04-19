@@ -1,0 +1,18 @@
+# rag-service/.render.yaml
+# Render Blueprint — deploy this directory as a standalone Web Service
+
+services:
+  - type: web
+    name: finsight-rag
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    plan: free            # switch to "starter" if you need always-on
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false       # you'll set this in the Render dashboard
+      - key: GROQ_MODEL
+        value: meta-llama/llama-4-scout-17b-16e-instruct
+      - key: PORT
+        value: "5001"
+    healthCheckPath: /

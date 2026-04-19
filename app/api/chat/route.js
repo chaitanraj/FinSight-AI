@@ -7,7 +7,8 @@ export async function POST(req) {
       return Response.json({ error: "message_required" }, { status: 400 });
     }
 
-    const res = await fetch(`${process.env.ML_SERVER}/rag/chat`, {
+    const ragUrl = process.env.RAG_SERVER || process.env.ML_SERVER;
+    const res = await fetch(`${ragUrl}/rag/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

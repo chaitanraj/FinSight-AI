@@ -14,4 +14,4 @@ embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
 db = Chroma.from_documents(chunks, embeddings, persist_directory="chroma_db")
 
-print(f"✓ Created knowledge base with {len(chunks)} chunks from {len(documents)} pages")
+print(f"Created knowledge base with {len(chunks)} chunks from {len(documents)} pages")

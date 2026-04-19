@@ -8,7 +8,6 @@ from predictor import (
 )
 from anomaly import detect_anomaly_model
 import os
-from rag import get_rag_response
 
 app = Flask(__name__)
 CORS(app, resources={
@@ -87,24 +86,6 @@ def detect_anomaly():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
-
-@app.route("/rag/chat", methods=["POST"])
-def rag_chat():
-    try:
-        data = request.get_json() or {}
-        user_query = data.get("message")
-
-        if not user_query or not isinstance(user_query, str):
-            return jsonify({"error": "message_required"}), 400
-
-        result = get_rag_response(user_query)
-        return jsonify(result), 200
-
-    except RuntimeError as e:
-        return jsonify({"error": str(e)}), 503
-    except Exception:
-        return jsonify({"error": "rag_service_failed"}), 500
 
 
 if __name__ == "__main__":

@@ -29,7 +29,6 @@ def groq_generate(prompt: str) -> str:
             "Groq API key is missing. Set GROQ_API_KEY."
         )
 
-    # Google AI Studio keys typically start with AIza and are not valid for Groq.
     if GROQ_API_KEY.startswith("AIza"):
         raise RuntimeError(
             "Detected a Google key (AIza) for Groq. Configure GROQ_API_KEY with a valid Groq key."
